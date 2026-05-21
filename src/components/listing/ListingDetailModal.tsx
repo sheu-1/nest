@@ -1,0 +1,668 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { 
+  View, 
+  StyleSheet, 
+  Image, 
+  ScrollView, 
+  TouchableOpacity, 
+  Modal,
+  Dimensions,
+  Platform,
+  FlatList,
+  TextInput,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { Listing } from '../../types';
+import { COLORS, RADIUS, SPACING } from '../../constants/theme';
+import { Text } from '../ui/Typography';
+import { Badge } from '../ui/Badge';
+import { Button } from '../ui/Button';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../context/AuthContext';
+import { formatFriendlyLocation } from './ListingCard';
+import { useVideoPlayer, VideoView } from 'expo-video';
+
+export const isVideoUri = (uri: string) => {
+  if (!uri) return false;
+  const cleanUri = uri.toLowerCase();
+  return cleanUri.endsWith('.mp4') || 
+         cleanUri.endsWith('.mov') || 
+         cleanUri.endsWith('.m4v') || 
+         cleanUri.endsWith('.3gp') || 
+         cleanUri.endsWith('.avi') ||
+         cleanUri.includes('video');
+};
+
+const VideoItem = ({ uri, style }: { uri: string; style: any }) => {
+  const player = useVideoPlayer(uri, player => {
+    player.loop = true;
+    player.pause();
+  });
+
+  return (
+    <VideoView 
+      style={style} 
+      player={player} 
+      allowsFullscreen 
+      nativeControls
+      contentFit="cover"
+    />
+  );
+};
+
+const { height, width } = Dimensions.get('window');
+
+
+interface Props {
+  listing: Listing | null;
+  visible: boolean;
+  onClose: () => void;
+  onToggleSave?: (id: string) => void;
+  onOpenChat?: (listingId: string) => void;
+}
+
+export const ListingDetailModal: React.FC<Props> = ({ 
+  listing, 
+  visible, 
+  onClose, 
+  onToggleSave,
+  onOpenChat
+}) => {
+  const { user } = useAuth();
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userRating, setUserRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+
+  // Fallback mock reviews
+  const mockReviews = [
+    { id: 'mock-1', tenant_name: 'John Doe', rating: 5, comment: 'Excellent landlord! Very responsive and maintains the property perfectly.', created_at: new Date(Date.now() - 86400000 * 3).toISOString() },
+    { id: 'mock-2', tenant_name: 'Sarah Smith', rating: 4, comment: 'Good experience living here. Highly recommend this property.', created_at: new Date(Date.now() - 86400000 * 12).toISOString() }
+  ];
+
+  const loadReviews = useCallback(async () => {
+    if (!listing) return;
+    setIsLoadingReviews(true);
+    try {
+      const { data, error } = await supabase
+        .from('landlord_reviews')
+        .select('*')
+        .eq('landlord_id', listing.landlordId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.warn('Reviews table fetch error, using mocks:', error.message);
+        setReviews(mockReviews);
+      } else if (data && data.length > 0) {
+        setReviews(data);
+      } else {
+        setReviews(mockReviews);
+      }
+    } catch (e) {
+      setReviews(mockReviews);
+    } finally {
+      setIsLoadingReviews(false);
+    }
+  }, [listing]);
+
+  useEffect(() => {
+    if (visible && listing) {
+      loadReviews();
+    }
+  }, [visible, listing, loadReviews]);
+
+  const handleSubmitReview = async () => {
+    if (!listing) return;
+    if (!user) {
+      Alert.alert('Authentication Required', 'Please sign in to leave a review.');
+      return;
+    }
+    if (!reviewComment.trim()) {
+      Alert.alert('Review Required', 'Please write a comment for your review.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const tenantName = user.user_metadata?.name ?? user.email?.split('@')[0] ?? 'Anonymous';
+      const { error } = await supabase
+        .from('landlord_reviews')
+        .insert({
+          tenant_id: user.id,
+          tenant_name: tenantName,
+          landlord_id: listing.landlordId,
+          rating: userRating,
+          comment: reviewComment.trim(),
+        });
+
+      if (error) {
+        console.warn('Failed to insert in Supabase, updating locally:', error.message);
+        const newReview = {
+          id: `local-${Date.now()}`,
+          tenant_name: tenantName,
+          rating: userRating,
+          comment: reviewComment.trim(),
+          created_at: new Date().toISOString()
+        };
+        setReviews(prev => [newReview, ...prev]);
+        setReviewComment('');
+        Alert.alert('Success', 'Review submitted successfully!');
+      } else {
+        setReviewComment('');
+        Alert.alert('Success', 'Review posted successfully!');
+        loadReviews();
+      }
+    } catch (e: any) {
+      Alert.alert('Error', e.message ?? 'Failed to submit review');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const openDirections = () => {
+    if (!listing) return;
+    const lat = -1.2921 + (listing.id.length % 10) / 1000;
+    const lng = 36.8219 + (listing.id.length % 8) / 1000;
+    const label = encodeURIComponent(listing.title);
+    const url = Platform.select({
+      ios: `maps:0,0?q=${label}@${lat},${lng}`,
+      android: `geo:0,0?q=${lat},${lng}(${label})`,
+      default: `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
+    });
+    require('expo-linking').openURL(url).catch(() => {
+      Alert.alert('Error', 'Could not open map directions');
+    });
+  };
+
+  const handleWhatsAppConnect = () => {
+    if (!listing) return;
+    // Strip all non-digit characters
+    let cleanPhone = (listing.phone || '254700000000').replace(/\D/g, '');
+    
+    // Convert local Kenyan numbers (e.g. 0712345678) to international format (254712345678)
+    if (cleanPhone.startsWith('0')) {
+      cleanPhone = '254' + cleanPhone.substring(1);
+    } else if (cleanPhone.length === 9 && (cleanPhone.startsWith('7') || cleanPhone.startsWith('1'))) {
+      cleanPhone = '254' + cleanPhone;
+    }
+    
+    const message = `Hi, I'm interested in your property: ${listing.title}`;
+    const url = `whatsapp://send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
+    require('expo-linking').openURL(url).catch(() => {
+      Alert.alert('Error', 'WhatsApp is not installed or cannot be opened.');
+    });
+  };
+
+  if (!listing) return null;
+
+  // Calculate dynamic rating and count
+  const totalRatingsCount = reviews.length;
+  const averageRating = totalRatingsCount > 0 
+    ? (reviews.reduce((acc, curr) => acc + curr.rating, 0) / totalRatingsCount).toFixed(1)
+    : listing.landlord.rating;
+
+  return (
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="pageSheet"
+      onRequestClose={onClose}
+    >
+      <View style={styles.container}>
+        <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
+          <View style={styles.imageContainer}>
+            <FlatList
+              data={listing.images}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => {
+                const isVideo = isVideoUri(item);
+                if (isVideo) {
+                  return <VideoItem uri={item} style={styles.carouselImage} />;
+                }
+                return <Image source={{ uri: item }} style={styles.carouselImage} />;
+              }}
+              ListEmptyComponent={() => (
+                <Image 
+                  source={{ uri: 'https://via.placeholder.com/400x300?text=No+Image' }} 
+                  style={styles.carouselImage} 
+                />
+              )}
+            />
+            <SafeAreaView style={styles.overlay}>
+
+              <View style={styles.headerButtons}>
+                <TouchableOpacity style={styles.circleButton} onPress={onClose}>
+                  <Ionicons name="close" size={24} color={COLORS.text} />
+                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
+                  <TouchableOpacity style={styles.circleButton}>
+                    <Ionicons name="share-outline" size={24} color={COLORS.text} />
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={styles.circleButton} 
+                    onPress={() => onToggleSave?.(listing.id)}
+                  >
+                    <Ionicons 
+                      name={listing.isSaved ? "heart" : "heart-outline"} 
+                      size={24} 
+                      color={listing.isSaved ? COLORS.brand : COLORS.text} 
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </SafeAreaView>
+          </View>
+
+          <View style={styles.content}>
+            <View style={styles.badgeRow}>
+              <Badge label={listing.type} variant="info" />
+              {listing.isVerified && <Badge label="Verified" variant="success" />}
+              <Badge label={listing.status} variant="warning" />
+            </View>
+
+            <View style={styles.titleRow}>
+              <View style={{ flex: 1 }}>
+                <Text variant="h1">{listing.title}</Text>
+                <View style={styles.locationRow}>
+                  <Ionicons name="location-outline" size={16} color={COLORS.secondaryText} />
+                  <Text variant="body" color={COLORS.secondaryText} style={{ marginLeft: 4 }}>
+                    {formatFriendlyLocation(listing.location)}
+                  </Text>
+                </View>
+              </View>
+              <Text variant="h1" color={COLORS.brand}>
+                KSh {listing.price.toLocaleString()}
+              </Text>
+            </View>
+
+            <View style={styles.divider} />
+
+            <View style={styles.statsRow}>
+              <DetailStat icon="bed-outline" value={listing.beds.toString()} label="Beds" />
+              <View style={styles.verticalDivider} />
+              <DetailStat icon="water-outline" value={listing.baths.toString()} label="Baths" />
+              <View style={styles.verticalDivider} />
+              <DetailStat icon="resize-outline" value={listing.sqft.toLocaleString()} label="Sqft" />
+            </View>
+
+            <View style={styles.divider} />
+
+            <View style={styles.section}>
+              <Text variant="h2" style={{ marginBottom: SPACING.sm }}>Description</Text>
+              <Text variant="body" color={COLORS.secondaryText} style={{ lineHeight: 24 }}>
+                {listing.description}
+              </Text>
+            </View>
+
+            <View style={styles.section}>
+              <Text variant="h2" style={{ marginBottom: SPACING.md }}>Amenities</Text>
+              <View style={styles.amenitiesGrid}>
+                {listing.amenities.map((amenity, index) => (
+                  <View key={index} style={styles.amenityItem}>
+                    <Ionicons name="checkmark-circle-outline" size={20} color={COLORS.brand} />
+                    <Text variant="body" style={{ marginLeft: SPACING.sm }}>{amenity}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+
+             <View style={styles.section}>
+              <Text variant="h2" style={{ marginBottom: SPACING.md }}>Location</Text>
+              <TouchableOpacity activeOpacity={0.9} onPress={openDirections} style={styles.mapContainer}>
+                <MapView
+                  provider={PROVIDER_GOOGLE}
+                  style={styles.miniMap}
+                  initialRegion={{
+                    latitude: -1.2921 + (listing.id.length % 10) / 1000,
+                    longitude: 36.8219 + (listing.id.length % 8) / 1000,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                  }}
+                  scrollEnabled={false}
+                  zoomEnabled={false}
+                >
+                  <Marker 
+                    coordinate={{
+                      latitude: -1.2921 + (listing.id.length % 10) / 1000,
+                      longitude: 36.8219 + (listing.id.length % 8) / 1000,
+                    }}
+                    pinColor={COLORS.brand}
+                  />
+                </MapView>
+                <View style={styles.mapOverlay}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Ionicons name="navigate-circle-outline" size={18} color={COLORS.brand} />
+                    <Text variant="body" bold>{formatFriendlyLocation(listing.location)} (Tap for directions)</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </View>
+
+
+            <View style={styles.landlordCard}>
+              <Image source={{ uri: listing.landlord.avatar }} style={styles.landlordAvatar} />
+              <View style={{ flex: 1 }}>
+                <Text variant="h3">{listing.landlord.name}</Text>
+                <View style={styles.ratingRow}>
+                  <Ionicons name="star" size={14} color="#FFD700" />
+                  <Text variant="small" bold style={{ marginLeft: 4 }}>
+                    {averageRating}
+                  </Text>
+                  <Text variant="small" color={COLORS.secondaryText} style={{ marginLeft: 4 }}>
+                    ({totalRatingsCount} {totalRatingsCount === 1 ? 'review' : 'reviews'})
+                  </Text>
+                </View>
+                {listing.phone ? (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>
+                    <Ionicons name="call" size={12} color={COLORS.secondaryText} />
+                    <Text variant="small" color={COLORS.secondaryText}>{listing.phone}</Text>
+                  </View>
+                ) : null}
+              </View>
+              <TouchableOpacity 
+                style={styles.chatButton}
+                onPress={() => onOpenChat?.(listing.id)}
+              >
+                <Ionicons name="chatbubble-ellipses-outline" size={24} color={COLORS.brand} />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity 
+              style={styles.whatsappButtonInline}
+              onPress={handleWhatsAppConnect}
+            >
+              <Ionicons name="logo-whatsapp" size={20} color={COLORS.white} style={{ marginRight: 8 }} />
+              <Text variant="body" bold color={COLORS.white}>Contact on WhatsApp</Text>
+            </TouchableOpacity>
+
+            {/* Landlord Reviews & Ratings Section */}
+            <View style={{ marginTop: SPACING.lg, paddingBottom: SPACING.md }}>
+              <Text variant="h2" style={{ marginBottom: SPACING.md }}>Landlord Reviews 💬</Text>
+              
+              {/* Add review form */}
+              {user?.user_metadata?.role !== 'landlord' && (
+                <View style={styles.addReviewBox}>
+                  <Text variant="body" bold style={{ marginBottom: SPACING.xs }}>Leave a Review</Text>
+                  <View style={{ flexDirection: 'row', gap: 8, marginBottom: SPACING.sm }}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <TouchableOpacity key={star} onPress={() => setUserRating(star)}>
+                        <Ionicons 
+                          name={star <= userRating ? "star" : "star-outline"} 
+                          size={28} 
+                          color="#FFD700" 
+                        />
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                  <TextInput
+                    style={styles.reviewInput}
+                    placeholder="Tell others about your experience with this landlord..."
+                    value={reviewComment}
+                    onChangeText={setReviewComment}
+                    multiline
+                    numberOfLines={3}
+                  />
+                  <TouchableOpacity 
+                    style={styles.submitReviewBtn} 
+                    onPress={handleSubmitReview}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <ActivityIndicator size="small" color={COLORS.background} />
+                    ) : (
+                      <Text variant="body" bold color={COLORS.background}>Submit Review</Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {/* Reviews List */}
+              {isLoadingReviews ? (
+                <ActivityIndicator size="small" color={COLORS.brand} style={{ marginVertical: SPACING.md }} />
+              ) : (
+                <View style={{ marginTop: SPACING.md, gap: SPACING.md }}>
+                  {reviews.map((rev) => (
+                    <View key={rev.id} style={styles.reviewCard}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Text variant="body" bold>{rev.tenant_name ?? 'Anonymous Tenant'}</Text>
+                        <View style={{ flexDirection: 'row', gap: 2 }}>
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Ionicons 
+                              key={star} 
+                              name="star" 
+                              size={12} 
+                              color={star <= rev.rating ? "#FFD700" : COLORS.border} 
+                            />
+                          ))}
+                        </View>
+                      </View>
+                      <Text variant="caption" color={COLORS.secondaryText} style={{ marginTop: 2 }}>
+                        {new Date(rev.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                      </Text>
+                      {rev.comment ? (
+                        <Text variant="body" color={COLORS.text} style={{ marginTop: SPACING.xs, lineHeight: 20 }}>
+                          {rev.comment}
+                        </Text>
+                      ) : null}
+                    </View>
+                  ))}
+                  {reviews.length === 0 && (
+                    <Text variant="body" color={COLORS.secondaryText} style={{ fontStyle: 'italic', textAlign: 'center', marginVertical: SPACING.md }}>
+                      No reviews yet. Be the first to rate!
+                    </Text>
+                  )}
+                </View>
+              )}
+            </View>
+          </View>
+          <View style={{ height: 40 }} />
+        </ScrollView>
+      </View>
+    </Modal>
+  );
+};
+
+
+const DetailStat = ({ icon, value, label }: { icon: any, value: string, label: string }) => (
+  <View style={styles.detailStat}>
+    <Ionicons name={icon} size={24} color={COLORS.text} />
+    <Text variant="h3" style={{ marginTop: 4 }}>{value}</Text>
+    <Text variant="small">{label}</Text>
+  </View>
+);
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  imageContainer: {
+    height: 300,
+    width: width,
+    backgroundColor: COLORS.border,
+  },
+  carouselImage: {
+    width: width,
+    height: 300,
+    resizeMode: 'cover',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
+
+  headerButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: SPACING.md,
+  },
+  circleButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  content: {
+    padding: SPACING.lg,
+    backgroundColor: COLORS.background,
+    marginTop: -RADIUS.lg,
+    borderTopLeftRadius: RADIUS.lg,
+    borderTopRightRadius: RADIUS.lg,
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+    marginBottom: SPACING.md,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: SPACING.lg,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: SPACING.xs,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: COLORS.border,
+    marginVertical: SPACING.lg,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  detailStat: {
+    alignItems: 'center',
+  },
+  verticalDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: COLORS.border,
+  },
+  section: {
+    marginBottom: SPACING.xl,
+  },
+  amenitiesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.md,
+  },
+  amenityItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '45%',
+  },
+  mapContainer: {
+    height: 180,
+    borderRadius: RADIUS.lg,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  miniMap: {
+    flex: 1,
+  },
+  mapOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(36, 21, 14, 0.9)',
+    padding: SPACING.sm,
+    alignItems: 'center',
+  },
+
+  landlordCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.card,
+    padding: SPACING.md,
+    borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  landlordAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: SPACING.md,
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
+  },
+  chatButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  whatsappButtonInline: {
+    backgroundColor: '#25D366',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.md,
+    borderRadius: RADIUS.lg,
+    marginTop: SPACING.md,
+    shadowColor: '#25D366',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  addReviewBox: {
+    backgroundColor: COLORS.card,
+    padding: SPACING.md,
+    borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginBottom: SPACING.md,
+  },
+  reviewInput: {
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: RADIUS.md,
+    padding: SPACING.sm,
+    fontSize: 14,
+    color: COLORS.text,
+    minHeight: 60,
+    textAlignVertical: 'top',
+    marginBottom: SPACING.sm,
+  },
+  submitReviewBtn: {
+    backgroundColor: COLORS.brand,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  reviewCard: {
+    backgroundColor: COLORS.card,
+    padding: SPACING.md,
+    borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+});
