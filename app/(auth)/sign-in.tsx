@@ -259,7 +259,7 @@ export default function SignInScreen() {
                 onPress={() => setSelectedRole('landlord')}
               >
                 <Text style={[styles.roleTabText, selectedRole === 'landlord' && styles.roleTabTextActive]}>
-                  💼 Landlord
+                  💼 Property Owner
                 </Text>
               </TouchableOpacity>
             </View>
@@ -371,7 +371,7 @@ export default function SignInScreen() {
                     onPress={() => setSelectedRole('landlord')}
                   >
                     <Text style={[styles.roleTabText, selectedRole === 'landlord' && styles.roleTabTextActive]}>
-                      💼 Landlord
+                      💼 Property Owner
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
   },
   leftChocolatePanel: {
     width: '45%',
-    backgroundColor: '#8D6E63', // Solid chocolate brown
+    backgroundColor: '#7a480d', // Solid chocolate brown
     justifyContent: 'center',
     alignItems: 'center',
     padding: 40,
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
   },
   mobileTopHeader: {
     height: 200,
-    backgroundColor: '#8D6E63', // Solid chocolate brown on top
+    backgroundColor: '#7a480d', // Solid chocolate brown on top
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -512,6 +512,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     marginTop: -20,
     padding: 24,
+    paddingBottom: 40,
   },
 
   // Form Components
@@ -570,12 +571,12 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     width: '100%',
-    backgroundColor: '#8D6E63', // Chocolate brown primary button
+    backgroundColor: '#7a480d', // Chocolate brown primary button
     height: 54,
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#8D6E63',
+    shadowColor: '#7a480d',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 10,
@@ -642,7 +643,7 @@ const styles = StyleSheet.create({
   },
   landlordDemoText: {
     fontSize: 13,
-    color: '#8D6E63', // Warm rich chocolate brown
+    color: '#7a480d', // Warm rich chocolate brown
     fontWeight: 'bold',
   },
   roleToggleContainer: {

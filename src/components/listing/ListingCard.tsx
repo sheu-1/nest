@@ -99,6 +99,19 @@ export const ListingCard: React.FC<Props> = ({ listing, onPress, onToggleSave, o
     }).start();
   };
 
+  const handleOpenMaps = () => {
+    const location = listing.location;
+    let destination = '';
+    const coordRegex = /^-?\d+\.\d+,\s*-?\d+\.\d+$/;
+    if (coordRegex.test(location.trim())) {
+      destination = location.trim();
+    } else {
+      destination = encodeURIComponent(location + ', Nairobi, Kenya');
+    }
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=driving`;
+    Linking.openURL(url).catch(() => {});
+  };
+
   const handleWhatsAppPress = () => {
     let rawPhone = listing.phone || (listing.landlord as any)?.phone || '0700000000';
     let cleanPhone = rawPhone.replace(/\D/g, '');
@@ -122,6 +135,7 @@ export const ListingCard: React.FC<Props> = ({ listing, onPress, onToggleSave, o
       }
     });
   };
+
 
   const handleShare = async () => {
     try {
@@ -235,10 +249,10 @@ export const ListingCard: React.FC<Props> = ({ listing, onPress, onToggleSave, o
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.actionIcon}
-            onPress={() => setShowMap(!showMap)}
+            onPress={handleOpenMaps}
           >
             <Ionicons 
-              name={showMap ? "image-outline" : "map-outline"} 
+              name="map-outline" 
               size={26} 
               color={COLORS.text} 
             />

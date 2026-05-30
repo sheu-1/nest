@@ -48,7 +48,7 @@ const getAvatarBgColor = (name: string) => {
   for (let i = 0; i < name.length; i++) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   }
-  const colors = ['#C8511B', '#8D6E63', '#8D6E63', '#D84315', '#E65100', '#8D6E63'];
+  const colors = ['#C8511B', '#7a480d', '#7a480d', '#D84315', '#E65100', '#7a480d'];
   const index = Math.abs(hash) % colors.length;
   return colors[index];
 };
@@ -94,7 +94,7 @@ export default function TenantMessagesScreen() {
           },
           recipient: {
             id: d.landlordProfile?.id || 'landlord',
-            name: d.landlordProfile?.name || 'Landlord',
+            name: d.landlordProfile?.name || 'Property Owner',
             avatar: d.landlordProfile?.avatar_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
           }
         }));

@@ -48,7 +48,7 @@ const getAvatarBgColor = (name: string) => {
   for (let i = 0; i < name.length; i++) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   }
-  const colors = ['#C8511B', '#8D6E63', '#8D6E63', '#D84315', '#E65100', '#8D6E63'];
+  const colors = ['#C8511B', '#7a480d', '#7a480d', '#D84315', '#E65100', '#7a480d'];
   const index = Math.abs(hash) % colors.length;
   return colors[index];
 };

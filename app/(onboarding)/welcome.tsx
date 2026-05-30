@@ -17,7 +17,7 @@ export default function WelcomeScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <View style={styles.header}>
-          <NestLogo width={220} textColor="#8D6E63" />
+          <NestLogo width={220} textColor="#7a480d" />
           <Text variant="h1" style={[styles.title, { marginTop: SPACING.xl }]}>Find Your Perfect Home</Text>
           <Text variant="body" color={COLORS.secondaryText} style={styles.subtitle}>
             Whether you're searching for an apartment or listing a property

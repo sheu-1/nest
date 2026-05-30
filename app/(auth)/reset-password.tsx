@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#8D6E63',
+    color: '#7a480d',
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.5,

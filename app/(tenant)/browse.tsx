@@ -213,9 +213,7 @@ export default function TenantBrowseScreen() {
           if (height > 0) setHeaderHeight(height);
         }}
       >
-        <View>
-          <NestLogo width={100} textColor="#C8511B" />
-        </View>
+        <NestLogo width={120} textColor="#C8511B" />
         
         <View style={styles.headerRightContainer}>
           <TouchableOpacity onPress={() => setShowFilters(!showFilters)} style={{ marginRight: 6 }}>
@@ -398,13 +396,18 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 100, // Stays sticky permanently!
   },
-  logoText: {
-    fontSize: 26,
+  logoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  appName: {
+    fontSize: 20,
     fontWeight: '900',
-    fontFamily: 'Inter_700Bold',
     color: COLORS.brand,
-    letterSpacing: -1.2,
-    textTransform: 'lowercase',
+    letterSpacing: -0.8,
+    fontFamily: 'Inter_700Bold',
+    lineHeight: 22,
   },
   animatedFiltersContainer: {
     position: 'absolute',

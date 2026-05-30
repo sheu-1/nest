@@ -108,7 +108,7 @@ export default function RoleSelectScreen() {
                   <View style={styles.iconWrapper}>
                     <Text style={{ fontSize: 44 }}>🏠</Text>
                   </View>
-                  <Text style={styles.cardTitle}>Landlord</Text>
+                  <Text style={styles.cardTitle}>Property Owner</Text>
                   <Text style={styles.cardDesc}>
                     Post listings, manage properties, connect with tenants
                   </Text>
@@ -215,7 +215,7 @@ export default function RoleSelectScreen() {
                     <View style={styles.iconWrapper}>
                       <Text style={{ fontSize: 48 }}>🏠</Text>
                     </View>
-                    <Text style={styles.cardTitle}>Landlord</Text>
+                    <Text style={styles.cardTitle}>Property Owner</Text>
                     <Text style={styles.cardDesc}>
                       Post listings, manage properties, connect with tenants
                     </Text>

@@ -102,11 +102,7 @@ export default function SignUpScreen() {
         await setRole(selectedRole); 
         await completeOnboarding();
         
-        if (selectedRole === 'landlord') {
-          router.replace('/(landlord-tabs)/dashboard');
-        } else {
-          router.replace('/(tenant-tabs)/browse');
-        }
+        router.replace('/(tenant-tabs)/browse');
       }
     } catch (e) {
       console.error(e);
@@ -128,11 +124,7 @@ export default function SignUpScreen() {
       } else {
         await setRole(selectedRole);
         await completeOnboarding();
-        if (selectedRole === 'landlord') {
-          router.replace('/(landlord-tabs)/dashboard');
-        } else {
-          router.replace('/(tenant-tabs)/browse');
-        }
+        router.replace('/(tenant-tabs)/browse');
       }
     } catch (e: any) {
       Alert.alert('Google Sign Up Failed', e?.message || 'An unexpected error occurred.');
@@ -160,6 +152,15 @@ export default function SignUpScreen() {
               <Text style={styles.heading}>Create Account</Text>
               <Text style={styles.subheading}>Join Nest to find your perfect home</Text>
             </View>
+
+            {/* Property owner link at top */}
+            <TouchableOpacity
+              style={styles.ownerBanner}
+              onPress={() => router.push('/(auth)/landlord-sign-up')}
+            >
+              <Ionicons name="business-outline" size={16} color="#7a480d" />
+              <Text style={styles.ownerBannerText}>Are you a property owner? <Text style={styles.ownerBannerLink}>Sign up here →</Text></Text>
+            </TouchableOpacity>
 
             <Animated.View style={{ transform: [{ translateX: shakeAnim }], width: '100%' }}>
               {/* Fields */}
@@ -251,19 +252,6 @@ export default function SignUpScreen() {
 
 
 
-              <View style={styles.footerLinkRow}>
-                <Text style={styles.footerMutedText}>Already have an account? </Text>
-                <TouchableOpacity onPress={() => router.replace('/(auth)/sign-in')}>
-                  <Text style={styles.linkText}>Sign In</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={[styles.footerLinkRow, { marginTop: 4, marginBottom: 8 }]}>
-                <Text style={styles.footerMutedText}>Are you a property owner? </Text>
-                <TouchableOpacity onPress={() => router.push('/(auth)/landlord-sign-up')}>
-                  <Text style={styles.linkText}>Sign up here →</Text>
-                </TouchableOpacity>
-              </View>
             </Animated.View>
           </View>
         </ScrollView>
@@ -373,19 +361,6 @@ export default function SignUpScreen() {
 
 
 
-                  <View style={styles.footerLinkRow}>
-                    <Text style={styles.footerMutedText}>Already have an account? </Text>
-                    <TouchableOpacity onPress={() => router.replace('/(auth)/sign-in')}>
-                      <Text style={styles.linkText}>Sign In</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  <View style={[styles.footerLinkRow, { marginTop: 4, marginBottom: 8 }]}>
-                    <Text style={styles.footerMutedText}>Are you a property owner? </Text>
-                    <TouchableOpacity onPress={() => router.push('/(auth)/landlord-sign-up')}>
-                      <Text style={styles.linkText}>Sign up here →</Text>
-                    </TouchableOpacity>
-                  </View>
                 </Animated.View>
               </View>
             </ScrollView>
@@ -456,6 +431,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     marginTop: -20,
     padding: 24,
+    paddingBottom: 40,
   },
 
   // Form Components
@@ -625,6 +601,26 @@ const styles = StyleSheet.create({
   },
   roleTabTextActive: {
     color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  ownerBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(122, 72, 13, 0.08)',
+    borderRadius: 10,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(122, 72, 13, 0.2)',
+    marginBottom: 20,
+  },
+  ownerBannerText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#555555',
+  },
+  ownerBannerLink: {
+    color: '#7a480d',
     fontWeight: 'bold',
   },
 });
