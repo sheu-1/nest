@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert, ActivityIndicator, Modal } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text } from '../../src/components/ui/Typography';
 import { COLORS, SPACING, RADIUS } from '../../src/constants/theme';
@@ -7,13 +8,44 @@ import { PostListingForm } from '../../src/components/forms/PostListingForm';
 import { useAuth } from '../../src/context/AuthContext';
 import { supabase } from '../../src/lib/supabase';
 import { useToast } from '../../src/context/ToastContext';
+import * as FileSystem from 'expo-file-system/legacy';
+import { decode } from 'base64-arraybuffer';
 
 export default function LandlordPostScreen() {
   const { user } = useAuth();
   const { showToast } = useToast();
+  const router = useRouter();
+  const { editId } = useLocalSearchParams();
+  
   const [formKey, setFormKey] = useState(0); // reset form after success
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState('');
+  const [initialData, setInitialData] = useState<any>(null);
+  const [isLoadingEdit, setIsLoadingEdit] = useState(!!editId);
+
+  useEffect(() => {
+    const fetchEditData = async () => {
+      if (!editId) {
+        setIsLoadingEdit(false);
+        return;
+      }
+      try {
+        const { data, error } = await supabase
+          .from('listings')
+          .select('*')
+          .eq('id', editId)
+          .single();
+        if (error) throw error;
+        setInitialData(data);
+      } catch (err: any) {
+        Alert.alert('Error', 'Failed to load listing for editing');
+        router.back();
+      } finally {
+        setIsLoadingEdit(false);
+      }
+    };
+    fetchEditData();
+  }, [editId]);
 
   const handleSubmit = async (data: any) => {
     if (!user) { Alert.alert('Error', 'Not signed in'); return; }
@@ -36,10 +68,6 @@ export default function LandlordPostScreen() {
 
         setUploadProgress(`Uploading media ${i + 1} of ${mediaFiles.length}...`);
 
-        // Read uri as a blob
-        const response = await fetch(uri);
-        const blob = await response.blob();
-
         // Extract extension
         const fileExt = uri.split('.').pop()?.split('?')[0]?.toLowerCase() || 'jpg';
         const isVideo = ['mp4', 'mov', 'm4v', '3gp', 'avi'].includes(fileExt) || uri.toLowerCase().includes('video');
@@ -47,11 +75,18 @@ export default function LandlordPostScreen() {
         
         const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
+        const formData = new FormData();
+        formData.append('file', {
+          uri,
+          name: fileName,
+          type: contentType,
+        } as any);
+
         // Upload to supabase storage bucket
         const { error: uploadError } = await supabase.storage
           .from('listings')
-          .upload(fileName, blob, {
-            contentType,
+          .upload(fileName, formData, {
+            // No need to set contentType, fetch handles multipart/form-data boundaries automatically
             upsert: true
           });
 
@@ -68,9 +103,9 @@ export default function LandlordPostScreen() {
         uploadedUrls.push(publicUrl);
       }
 
-      setUploadProgress('Saving listing details...');
+      setUploadProgress(editId ? 'Updating listing details...' : 'Saving listing details...');
 
-      const { error } = await supabase.from('listings').insert({
+      const listingPayload = {
         landlord_id: user.id,
         landlord_name: user.user_metadata?.name ?? user.email,
         title: data.title,
@@ -80,20 +115,39 @@ export default function LandlordPostScreen() {
         type: data.type,
         beds: Number(data.beds) || 0,
         baths: Number(data.baths) || 0,
-        sqft: 0,
+        sqft: initialData?.sqft || 0,
         description: data.description,
         images: uploadedUrls,
-        emoji: '🏠',
+        emoji: initialData?.emoji || '🏠',
         amenities: data.amenities ?? [],
-        available: true,
-        status: 'Available',
+        available: initialData?.available ?? true,
+        status: initialData?.status ?? 'Available',
         phone: data.phone,
-      });
+        latitude: data.coords?.latitude,
+        longitude: data.coords?.longitude,
+      };
+
+      let error;
+      if (editId) {
+        const { error: updateErr } = await supabase
+          .from('listings')
+          .update(listingPayload)
+          .eq('id', editId);
+        error = updateErr;
+      } else {
+        const { error: insertErr } = await supabase
+          .from('listings')
+          .insert(listingPayload);
+        error = insertErr;
+      }
 
       if (error) throw error;
 
-      showToast('Listing posted successfully!', 'success');
+      showToast(editId ? 'Listing updated successfully!' : 'Listing posted successfully!', 'success');
       setFormKey(k => k + 1); // reset the form
+      if (editId) {
+        router.back();
+      }
     } catch (err: any) {
       console.error('Submit error:', err);
       Alert.alert('Error', err.message ?? 'Failed to post listing');
@@ -103,18 +157,29 @@ export default function LandlordPostScreen() {
     }
   };
 
+  if (isLoadingEdit) {
+    return (
+      <SafeAreaView style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
+        <ActivityIndicator size="large" color={COLORS.brand} />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text variant="h1" bold style={{ color: COLORS.brand }}>Post a Listing 🏠</Text>
+        <Text variant="h1" bold style={{ color: COLORS.brand }}>
+          {editId ? 'Edit Listing 🏠' : 'Post a Listing 🏠'}
+        </Text>
         <Text variant="small" color={COLORS.secondaryText} style={{ marginTop: 2 }}>
-          Fill in the details about your property
+          {editId ? 'Update details about your property' : 'Fill in the details about your property'}
         </Text>
       </View>
       <PostListingForm
         key={formKey}
         onClose={() => {}}
         onSubmit={handleSubmit}
+        initialData={initialData}
       />
 
       {isUploading && (

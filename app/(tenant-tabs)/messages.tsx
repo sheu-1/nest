@@ -48,7 +48,7 @@ const getAvatarBgColor = (name: string) => {
   for (let i = 0; i < name.length; i++) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   }
-  const colors = ['#C8511B', '#3E2723', '#8D6E63', '#D84315', '#E65100', '#5D4037'];
+  const colors = ['#C8511B', '#8D6E63', '#8D6E63', '#D84315', '#E65100', '#8D6E63'];
   const index = Math.abs(hash) % colors.length;
   return colors[index];
 };
@@ -60,40 +60,7 @@ export default function TenantMessagesScreen() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeChat, setActiveChat] = useState<ConversationThread | null>(null);
 
-  const mockThreads: ConversationThread[] = [
-    {
-      id: 'mock-thread-1',
-      last_message: 'Hi! Let me know if you would like to tour the penthouse this Sunday at 2 PM.',
-      updated_at: new Date(Date.now() - 1800000).toISOString(),
-      listing: {
-        id: '1',
-        title: 'Luxurious Penthouse in Kilimani',
-        image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500&auto=format&fit=crop&q=80',
-        price: 85000,
-      },
-      recipient: {
-        id: 'landlord-1',
-        name: 'David Mwangi',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
-      }
-    },
-    {
-      id: 'mock-thread-2',
-      last_message: 'Yes, water and garbage collection are fully included in the monthly rent.',
-      updated_at: new Date(Date.now() - 7200000).toISOString(),
-      listing: {
-        id: '2',
-        title: 'Modern Studio Apartment near CBD',
-        image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500&auto=format&fit=crop&q=80',
-        price: 32000,
-      },
-      recipient: {
-        id: 'landlord-2',
-        name: 'Sarah Jepchirchir',
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80',
-      }
-    }
-  ];
+
 
   const loadConversations = useCallback(async () => {
     if (!user) return;
@@ -133,11 +100,11 @@ export default function TenantMessagesScreen() {
         }));
         setConversations(formatted);
       } else {
-        setConversations(mockThreads);
+        setConversations([]);
       }
     } catch (err: any) {
-      console.warn('Real conversations fetch failed, using mocks:', err.message);
-      setConversations(mockThreads);
+      console.warn('Conversations fetch failed:', err.message);
+      setConversations([]);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);

@@ -3,9 +3,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { COLORS, RADIUS, SPACING } from '../../src/constants/theme';
 import { View, TouchableOpacity, Animated, StyleSheet, Text } from 'react-native';
 import { useTabVisibility } from '../../src/context/TabVisibilityContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TenantTabLayout() {
   const { translateY } = useTabVisibility();
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -14,7 +16,10 @@ export default function TenantTabLayout() {
         return (
           <Animated.View style={[
             styles.tabBar,
-            { transform: [{ translateY }] }
+            { 
+              transform: [{ translateY }],
+              bottom: Math.max(insets.bottom + 8, 16)
+            }
           ]}>
             {state.routes.filter(r => ['browse', 'saved', 'messages', 'profile'].includes(r.name)).map((route) => {
               const { options } = descriptors[route.key];

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { 
   View, 
   StyleSheet, 
@@ -8,6 +8,8 @@ import {
   Platform,
   Dimensions,
   Linking,
+  Share,
+  FlatList,
 } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
@@ -66,6 +68,20 @@ interface Props {
 export const ListingCard: React.FC<Props> = ({ listing, onPress, onToggleSave, onLongPress }) => {
   const [showMap, setShowMap] = useState(false);
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (listing.status === 'Available' || !listing.status) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, { toValue: 1.05, duration: 800, useNativeDriver: true }),
+          Animated.timing(pulseAnim, { toValue: 1, duration: 800, useNativeDriver: true })
+        ])
+      ).start();
+    } else {
+      pulseAnim.setValue(1);
+    }
+  }, [listing.status]);
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
@@ -84,14 +100,17 @@ export const ListingCard: React.FC<Props> = ({ listing, onPress, onToggleSave, o
   };
 
   const handleWhatsAppPress = () => {
-    let cleanPhone = listing.phone ? listing.phone.trim() : '';
-    if (!cleanPhone.startsWith('+')) {
-      if (cleanPhone.startsWith('0')) {
-        cleanPhone = '+254' + cleanPhone.substring(1);
-      } else {
-        cleanPhone = '+254' + cleanPhone;
-      }
+    let rawPhone = listing.phone || (listing.landlord as any)?.phone || '0700000000';
+    let cleanPhone = rawPhone.replace(/\D/g, '');
+    if (cleanPhone.startsWith('0')) {
+      cleanPhone = '254' + cleanPhone.substring(1);
+    } else if (cleanPhone.length === 9) {
+      cleanPhone = '254' + cleanPhone;
+    } else if (!cleanPhone.startsWith('254')) {
+      cleanPhone = '254' + cleanPhone;
     }
+    if (cleanPhone === '254') cleanPhone = '254700000000';
+
     const message = `Hello, I'm interested in your property "${listing.title}" listed on Nest!`;
     const url = `whatsapp://send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
     
@@ -102,6 +121,17 @@ export const ListingCard: React.FC<Props> = ({ listing, onPress, onToggleSave, o
         Linking.openURL(`https://wa.me/${cleanPhone.replace('+', '')}?text=${encodeURIComponent(message)}`);
       }
     });
+  };
+
+  const handleShare = async () => {
+    try {
+      const link = require('expo-linking').createURL(`listing/${listing.id}`);
+      await Share.share({
+        message: `Check out this property on Nest: ${listing.title} - ${listing.price.toLocaleString()} Ksh/mo\nLocation: ${formatFriendlyLocation(listing.location)}\n\nLink: ${link}`,
+      });
+    } catch (error) {
+      console.error('Error sharing', error);
+    }
   };
 
   const mockCoords = {
@@ -144,14 +174,7 @@ export const ListingCard: React.FC<Props> = ({ listing, onPress, onToggleSave, o
       </View>
 
       {/* 2. Edge-to-Edge Media Post Container */}
-      <TouchableOpacity
-        activeOpacity={1}
-        onPress={() => onPress(listing)}
-        onLongPress={() => onLongPress?.(listing)}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        style={styles.imageContainer}
-      >
+      <View style={styles.imageContainer}>
         {showMap ? (
           <MapView
             provider={PROVIDER_GOOGLE}
@@ -167,12 +190,29 @@ export const ListingCard: React.FC<Props> = ({ listing, onPress, onToggleSave, o
             <Marker coordinate={mockCoords} pinColor={COLORS.brand} />
           </MapView>
         ) : (
-          <Image 
-            source={{ uri: listing.images[0] || 'https://via.placeholder.com/400x300?text=No+Image' }} 
-            style={styles.image} 
+          <FlatList
+            data={listing.images?.length ? listing.images : ['https://via.placeholder.com/400x300?text=No+Image']}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() => onPress(listing)}
+                onLongPress={() => onLongPress?.(listing)}
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
+              >
+                <Image 
+                  source={{ uri: item }} 
+                  style={{ width, height: width * 1.15 }} 
+                />
+              </TouchableOpacity>
+            )}
           />
         )}
-      </TouchableOpacity>
+      </View>
 
       {/* 3. Action Buttons Bar */}
       <View style={styles.actionBar}>
@@ -203,13 +243,25 @@ export const ListingCard: React.FC<Props> = ({ listing, onPress, onToggleSave, o
               color={COLORS.text} 
             />
           </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.actionIcon}
+            onPress={handleShare}
+          >
+            <Ionicons name="share-outline" size={26} color={COLORS.text} />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity 
-          style={styles.actionIcon}
-          onPress={() => onPress(listing)}
-        >
-          <Ionicons name="bookmark-outline" size={24} color={COLORS.text} />
-        </TouchableOpacity>
+        <Animated.View style={{ justifyContent: 'center', alignItems: 'center', transform: [{ scale: pulseAnim }] }}>
+          <Text 
+            variant="small" 
+            bold 
+            style={[
+              styles.statusBadge, 
+              listing.status === 'Available' ? styles.statusAvailable : styles.statusTaken
+            ]}
+          >
+            {listing.status || 'Available'}
+          </Text>
+        </Animated.View>
       </View>
 
       {/* 4. Instagram Caption & Insights */}
@@ -300,7 +352,7 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: '100%',
-    height: width, // Perfect 1:1 square media ratio!
+    height: width * 1.15, // Taller portrait ratio
     backgroundColor: COLORS.border,
   },
   image: {
@@ -322,6 +374,21 @@ const styles = StyleSheet.create({
   },
   actionIcon: {
     padding: 4,
+  },
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    fontSize: 12,
+    overflow: 'hidden',
+  },
+  statusAvailable: {
+    backgroundColor: '#E8F5E9',
+    color: '#2E7D32',
+  },
+  statusTaken: {
+    backgroundColor: '#FFEBEE',
+    color: '#C62828',
   },
   captionSection: {
     paddingHorizontal: SPACING.md,

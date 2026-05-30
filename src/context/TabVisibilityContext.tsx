@@ -17,17 +17,19 @@ export const TabVisibilityProvider: React.FC<{ children: React.ReactNode }> = ({
   const translateY = useRef(new Animated.Value(0)).current;
 
   const hideTabBar = () => {
-    Animated.timing(translateY, {
-      toValue: 120, // Slide down past screen bottom!
-      duration: 250,
+    Animated.spring(translateY, {
+      toValue: 120, // Slide down past screen bottom
+      tension: 40,
+      friction: 8,
       useNativeDriver: true,
     }).start();
   };
 
   const showTabBar = () => {
-    Animated.timing(translateY, {
-      toValue: 0, // Slide back up smoothly!
-      duration: 250,
+    Animated.spring(translateY, {
+      toValue: 0, // Slide back up smoothly
+      tension: 40,
+      friction: 8,
       useNativeDriver: true,
     }).start();
   };

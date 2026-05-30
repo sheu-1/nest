@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { View, TouchableOpacity, StyleSheet, TextInput, Dimensions, Alert } from 'react-native';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { View, TouchableOpacity, StyleSheet, TextInput, Dimensions, Alert, ScrollView } from 'react-native';
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,9 +15,21 @@ interface Props {
   savedIds: string[];
 }
 
+const parseCoordinates = (listing: Listing) => {
+  if (listing?.latitude && listing?.longitude) {
+    return { latitude: Number(listing.latitude), longitude: Number(listing.longitude) };
+  }
+  const hash = (listing?.location ?? '').split('').reduce((acc: number, c: string) => acc + c.charCodeAt(0), 0);
+  return {
+    latitude: -1.2921 + (hash % 100) / 1000,
+    longitude: 36.8219 + (hash % 80) / 1000,
+  };
+};
+
 export const MapScreen: React.FC<Props> = ({ listings, onMarkerPress, savedIds }) => {
+  const mapRef = useRef<MapView>(null);
   const [region, setRegion] = useState({
-    latitude: -1.2921, // Nairobi default (lat is negative for south)
+    latitude: -1.2921,
     longitude: 36.8219,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
@@ -48,26 +60,30 @@ export const MapScreen: React.FC<Props> = ({ listings, onMarkerPress, savedIds }
 
   const handleMyLocation = () => {
     if (userLocation) {
-      setRegion({
+      const newRegion = {
         ...userLocation,
         latitudeDelta: 0.05,
         longitudeDelta: 0.05,
-      });
+      };
+      mapRef.current?.animateToRegion(newRegion, 600);
+      setRegion(newRegion);
     } else {
       Alert.alert('Location not available', 'Please enable location permissions in your settings.');
     }
   };
 
-  const parseCoordinates = (locationStr: string) => {
-    // Basic mock coordinate generator based on location name hash for demo
-    // In real app, you would use Geocoding API
-    const hash = locationStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return {
-      latitude: -1.2921 + (hash % 100) / 1000,
-      longitude: 36.8219 + (hash % 80) / 1000,
+  // When a suggestion (listing) is tapped, animate the map to its coordinates
+  const handleSuggestionSelect = (listing: Listing) => {
+    const coords = parseCoordinates(listing);
+    const newRegion = {
+      ...coords,
+      latitudeDelta: 0.05,
+      longitudeDelta: 0.05,
     };
+    mapRef.current?.animateToRegion(newRegion, 600);
+    setRegion(newRegion);
+    setSearchText(''); // clear search bar
   };
-
   return (
     <View style={styles.container}>
       {/* Search Bar */}
@@ -87,8 +103,20 @@ export const MapScreen: React.FC<Props> = ({ listings, onMarkerPress, savedIds }
         )}
       </View>
 
+      {/* Scrollable suggestions list */}
+      {searchText.length > 0 && (
+        <ScrollView style={styles.suggestionsContainer} keyboardShouldPersistTaps="handled">
+          {filteredListings.map((listing) => (
+            <TouchableOpacity key={listing.id} style={styles.suggestionItem} onPress={() => handleSuggestionSelect(listing)}>
+              <Text variant="body" color={COLORS.text}>{listing.title} — {listing.location}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      )}
+
       {/* Map */}
       <MapView
+        ref={mapRef}
         provider={PROVIDER_GOOGLE}
         style={styles.map}
         region={region}
@@ -110,7 +138,7 @@ export const MapScreen: React.FC<Props> = ({ listings, onMarkerPress, savedIds }
         {filteredListings.map(listing => (
           <Marker
             key={listing.id}
-            coordinate={parseCoordinates(listing.location)}
+            coordinate={parseCoordinates(listing)}
             pinColor={COLORS.brand}
             onPress={() => onMarkerPress(listing)}
           >
@@ -222,19 +250,38 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#fff',
   },
+  suggestionsContainer: {
+    position: 'absolute',
+    top: 72,
+    left: 12,
+    right: 12,
+    maxHeight: 200,
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    zIndex: 5,
+    paddingVertical: 4,
+  },
+  suggestionItem: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
   myLocationButton: {
     position: 'absolute',
-    bottom: 120,
+    bottom: 56,
     right: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: COLORS.white,
-    borderRadius: 25,
-    width: 50,
-    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 5,
   },
@@ -243,10 +290,11 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     backgroundColor: COLORS.white,
-    paddingVertical: 12,
-    alignItems: 'center',
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
+    alignItems: 'center',
   },
 });

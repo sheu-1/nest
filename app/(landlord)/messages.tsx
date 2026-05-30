@@ -48,7 +48,7 @@ const getAvatarBgColor = (name: string) => {
   for (let i = 0; i < name.length; i++) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   }
-  const colors = ['#C8511B', '#3E2723', '#8D6E63', '#D84315', '#E65100', '#5D4037'];
+  const colors = ['#C8511B', '#8D6E63', '#8D6E63', '#D84315', '#E65100', '#8D6E63'];
   const index = Math.abs(hash) % colors.length;
   return colors[index];
 };
@@ -60,40 +60,7 @@ export default function LandlordMessagesScreen() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeChat, setActiveChat] = useState<ConversationThread | null>(null);
 
-  const mockThreads: ConversationThread[] = [
-    {
-      id: 'mock-thread-landlord-1',
-      last_message: 'Is the deposit fully refundable upon leaving?',
-      updated_at: new Date(Date.now() - 900000).toISOString(),
-      listing: {
-        id: '1',
-        title: 'Luxurious Penthouse in Kilimani',
-        image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500&auto=format&fit=crop&q=80',
-        price: 85000,
-      },
-      recipient: {
-        id: 'tenant-1',
-        name: 'James Kiarie',
-        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80',
-      }
-    },
-    {
-      id: 'mock-thread-landlord-2',
-      last_message: 'Hi, does the house have a parking slot for two cars?',
-      updated_at: new Date(Date.now() - 14400000).toISOString(),
-      listing: {
-        id: '2',
-        title: 'Modern Studio Apartment near CBD',
-        image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500&auto=format&fit=crop&q=80',
-        price: 32000,
-      },
-      recipient: {
-        id: 'tenant-2',
-        name: 'Linda Cherono',
-        avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80',
-      }
-    }
-  ];
+
 
   const loadConversations = useCallback(async () => {
     if (!user) return;
@@ -133,11 +100,11 @@ export default function LandlordMessagesScreen() {
         }));
         setConversations(formatted);
       } else {
-        setConversations(mockThreads);
+        setConversations([]);
       }
     } catch (err: any) {
-      console.warn('Real landlord conversations fetch failed, using mocks:', err.message);
-      setConversations(mockThreads);
+      console.warn('Conversations fetch failed:', err.message);
+      setConversations([]);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);

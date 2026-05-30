@@ -12,8 +12,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING, RADIUS } from '../../src/constants/theme';
 import { Listing } from '../../src/types';
 import { Text } from '../../src/components/ui/Typography';
-import { ListingCard } from '../../src/components/listing/ListingCard';
+import { SavedListingCard } from '../../src/components/listing/SavedListingCard';
 import { ListingDetailModal } from '../../src/components/listing/ListingDetailModal';
+import { ChatModal } from '../../src/components/chat/ChatModal';
 import { storage } from '../../src/utils/storage';
 import { supabase } from '../../src/lib/supabase';
 import { useToast } from '../../src/context/ToastContext';
@@ -25,6 +26,7 @@ export default function TenantSavedScreen() {
   const { showToast } = useToast();
   const [savedListings, setSavedListings] = useState<Listing[]>([]);
   const [selected, setSelected] = useState<Listing | null>(null);
+  const [chatListing, setChatListing] = useState<Listing | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const loadSaved = useCallback(async () => {
@@ -111,7 +113,7 @@ export default function TenantSavedScreen() {
         onRefresh={loadSaved}
         refreshing={isLoading}
         renderItem={({ item }) => (
-          <ListingCard 
+          <SavedListingCard 
             listing={item} 
             onPress={() => setSelected(item)} 
             onToggleSave={handleToggleSave}
@@ -134,6 +136,28 @@ export default function TenantSavedScreen() {
           visible={!!selected}
           onClose={() => setSelected(null)}
           onToggleSave={handleToggleSave}
+          onOpenChat={() => {
+            const item = selected;
+            setSelected(null);
+            setTimeout(() => {
+              setChatListing(item);
+            }, 400);
+          }}
+        />
+      )}
+
+      {/* Real-time Message Chat Modal */}
+      {chatListing && (
+        <ChatModal
+          visible={!!chatListing}
+          onClose={() => setChatListing(null)}
+          listingId={chatListing.id}
+          listingTitle={chatListing.title}
+          listingImage={chatListing.images[0]}
+          listingPrice={Number(chatListing.price)}
+          recipientId={chatListing.landlord.id}
+          recipientName={chatListing.landlord.name}
+          recipientAvatar={chatListing.landlord.avatar}
         />
       )}
     </SafeAreaView>

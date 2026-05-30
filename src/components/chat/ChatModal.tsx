@@ -12,6 +12,7 @@ import {
   Image,
   Dimensions,
   Animated,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -37,7 +38,7 @@ const getAvatarBgColor = (name: string) => {
   for (let i = 0; i < name.length; i++) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   }
-  const colors = ['#C8511B', '#3E2723', '#8D6E63', '#D84315', '#E65100', '#5D4037'];
+  const colors = ['#C8511B', '#8D6E63', '#8D6E63', '#D84315', '#E65100', '#8D6E63'];
   const index = Math.abs(hash) % colors.length;
   return colors[index];
 };
@@ -126,19 +127,8 @@ export const ChatModal: React.FC<ChatModalProps> = ({
           }
         }
       } catch (err: any) {
-        console.warn('Chat init error (using mock storage):', err.message);
-        // Fallback: Generate a consistent mock conversation ID
-        const mockConvId = `mock-conv-${listingId}-${recipientId}`;
-        setConversationId(mockConvId);
-        setMessages([
-          {
-            id: 'welcome',
-            conversation_id: mockConvId,
-            sender_id: recipientId,
-            text: `Hi! Thanks for inquiring about ${listingTitle}. How can I help you today?`,
-            created_at: new Date(Date.now() - 3600000).toISOString(),
-          }
-        ]);
+        console.error('Chat init error:', err);
+        Alert.alert('Error', 'Could not initialize chat.');
       } finally {
         setIsLoading(false);
       }
@@ -242,23 +232,8 @@ export const ChatModal: React.FC<ChatModalProps> = ({
         .eq('id', conversationId);
 
     } catch (err: any) {
-      console.warn('Supabase message send failed, maintaining locally:', err.message);
-      // If db fails, keep local mock messages going so the simulation remains fluid
-      if (conversationId.startsWith('mock-')) {
-        setTimeout(() => {
-          // Auto reply simulator for standard feedback
-          const replyText = `Thanks for your interest! Let's schedule a viewing for this ${listingTitle} sometime this week.`;
-          const replyMsg: Message = {
-            id: `reply-${Date.now()}`,
-            conversation_id: conversationId,
-            sender_id: recipientId,
-            text: replyText,
-            created_at: new Date().toISOString(),
-          };
-          setMessages((prev) => [...prev, replyMsg]);
-          setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
-        }, 1500);
-      }
+      console.error('Supabase message send failed:', err.message);
+      Alert.alert('Error', 'Failed to send message.');
     }
   };
 
@@ -350,7 +325,7 @@ export const ChatModal: React.FC<ChatModalProps> = ({
             contentContainerStyle={styles.messagesList}
             showsVerticalScrollIndicator={false}
             renderItem={({ item }) => {
-              const isMe = item.sender_id !== recipientId; // Watertight alignment check
+              const isMe = item.sender_id === user?.id; // Correct watertight alignment check
               return (
                 <View style={[styles.messageRow, isMe ? styles.rowRight : styles.rowLeft]}>
                   <View style={[
@@ -376,7 +351,7 @@ export const ChatModal: React.FC<ChatModalProps> = ({
 
         {/* Chat Footer Input Area */}
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 8 : 0}
         >
           <View style={styles.footer}>

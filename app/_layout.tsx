@@ -22,14 +22,14 @@ import SplashScreen from '../src/components/ui/SplashScreen';
 
 function RootLayoutNav() {
   const { user, isLoading, onboardingCompleted, role } = useAuth();
-  const segments = useSegments();
+  const segments = useSegments() as string[];
   const router = useRouter();
 
   const [showSplash, setShowSplash] = useState(true);
   const splashOpacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    // Wait 1600ms, then fade out splash screen over 400ms (total 2000ms)
+    // Wait 2000ms (2 seconds), then fade out splash screen over 400ms
     const timer = setTimeout(() => {
       Animated.timing(splashOpacity, {
         toValue: 0,
@@ -38,7 +38,7 @@ function RootLayoutNav() {
       }).start(() => {
         setShowSplash(false);
       });
-    }, 1600);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -111,7 +111,7 @@ function RootLayoutNav() {
     const inTenantTabs = segments[0] === '(tenant-tabs)';
     const inLandlordTabs = segments[0] === '(landlord-tabs)';
     const isRoot = !segments[0] || segments[0] === 'index' || segments[0] === '(tabs)';
-    const isResetPassword = segments[0] === '(auth)' && segments[1] === 'reset-password';
+    const isResetPassword = segments[0] === '(auth)' && segments.length > 1 && segments[1] === 'reset-password';
 
     if (isResetPassword) return;
 

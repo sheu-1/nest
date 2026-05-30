@@ -1,7 +1,19 @@
 export type PropertyType = 'Apartment' | 'House' | 'Studio' | 'Villa' | 'Bedsitter';
 export type UserRole = 'tenant' | 'landlord';
 
+export interface Profile {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+  role: UserRole;
+  rating?: number;
+  idNumber?: string;
+  createdAt?: string;
+}
+
 export interface Landlord {
+
   id: string;
   name: string;
   avatar: string;
@@ -30,6 +42,8 @@ export interface Listing {
   available: boolean;
   landlordId?: string; // user.id of the landlord who posted it
   phone?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export type RootTabParamList = {

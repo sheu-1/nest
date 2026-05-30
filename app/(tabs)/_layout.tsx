@@ -2,11 +2,13 @@ import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../src/constants/theme';
 import { useAuth } from '../../src/context/AuthContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
   const { role } = useAuth();
   const isLandlord = role === 'landlord';
   const accentColor = isLandlord ? COLORS.brand : '#0066FF';
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -18,8 +20,8 @@ export default function TabLayout() {
           backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
           borderTopColor: '#F0EDE8',
-          height: 62,
-          paddingBottom: 8,
+          height: 62 + insets.bottom,
+          paddingBottom: 8 + insets.bottom,
           paddingTop: 4,
         },
         tabBarLabelStyle: {

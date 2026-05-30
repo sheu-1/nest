@@ -31,7 +31,8 @@ export default function SignUpScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<UserRole>('tenant');
+  // Role is always tenant on this page
+  const selectedRole: UserRole = 'tenant';
 
   // Focus states
   const [isNameFocused, setIsNameFocused] = useState(false);
@@ -151,33 +152,13 @@ export default function SignUpScreen() {
             <TouchableOpacity style={styles.mobileBackBtn} onPress={() => router.back()}>
               <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
             </TouchableOpacity>
-            <NestLogo width={180} textColor="#FFFFFF" />
+            <NestLogo width={180} textColor="#FFFFFF" centered />
           </View>
 
           <View style={styles.mobileFormSection}>
             <View style={styles.headerBlock}>
               <Text style={styles.heading}>Create Account</Text>
               <Text style={styles.subheading}>Join Nest to find your perfect home</Text>
-            </View>
-
-            <View style={styles.roleToggleContainer}>
-              <TouchableOpacity 
-                style={[styles.roleTab, selectedRole === 'tenant' && styles.roleTabActive]} 
-                onPress={() => setSelectedRole('tenant')}
-              >
-                <Text style={[styles.roleTabText, selectedRole === 'tenant' && styles.roleTabTextActive]}>
-                  🙋‍♂️ Tenant
-                </Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={[styles.roleTab, selectedRole === 'landlord' && styles.roleTabActive]} 
-                onPress={() => setSelectedRole('landlord')}
-              >
-                <Text style={[styles.roleTabText, selectedRole === 'landlord' && styles.roleTabTextActive]}>
-                  💼 Landlord
-                </Text>
-              </TouchableOpacity>
             </View>
 
             <Animated.View style={{ transform: [{ translateX: shakeAnim }], width: '100%' }}>
@@ -276,6 +257,13 @@ export default function SignUpScreen() {
                   <Text style={styles.linkText}>Sign In</Text>
                 </TouchableOpacity>
               </View>
+
+              <View style={[styles.footerLinkRow, { marginTop: 4, marginBottom: 8 }]}>
+                <Text style={styles.footerMutedText}>Are you a property owner? </Text>
+                <TouchableOpacity onPress={() => router.push('/(auth)/landlord-sign-up')}>
+                  <Text style={styles.linkText}>Sign up here →</Text>
+                </TouchableOpacity>
+              </View>
             </Animated.View>
           </View>
         </ScrollView>
@@ -284,7 +272,7 @@ export default function SignUpScreen() {
         <View style={styles.splitScreenContainer}>
           {/* Left Orange Panel */}
           <View style={styles.leftOrangePanel}>
-            <NestLogo width={240} textColor="#FFFFFF" />
+            <NestLogo width={240} textColor="#FFFFFF" centered />
             <Text style={styles.leftTagline}>Find Your Perfect Home</Text>
           </View>
 
@@ -295,26 +283,6 @@ export default function SignUpScreen() {
                 <View style={styles.headerBlock}>
                   <Text style={styles.heading}>Create Account</Text>
                   <Text style={styles.subheading}>Join Nest to find your perfect home</Text>
-                </View>
-
-                <View style={styles.roleToggleContainer}>
-                  <TouchableOpacity 
-                    style={[styles.roleTab, selectedRole === 'tenant' && styles.roleTabActive]} 
-                    onPress={() => setSelectedRole('tenant')}
-                  >
-                    <Text style={[styles.roleTabText, selectedRole === 'tenant' && styles.roleTabTextActive]}>
-                      🙋‍♂️ Tenant
-                    </Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity 
-                    style={[styles.roleTab, selectedRole === 'landlord' && styles.roleTabActive]} 
-                    onPress={() => setSelectedRole('landlord')}
-                  >
-                    <Text style={[styles.roleTabText, selectedRole === 'landlord' && styles.roleTabTextActive]}>
-                      💼 Landlord
-                    </Text>
-                  </TouchableOpacity>
                 </View>
 
                 <Animated.View style={{ transform: [{ translateX: shakeAnim }], width: '100%' }}>
@@ -409,6 +377,13 @@ export default function SignUpScreen() {
                     <Text style={styles.footerMutedText}>Already have an account? </Text>
                     <TouchableOpacity onPress={() => router.replace('/(auth)/sign-in')}>
                       <Text style={styles.linkText}>Sign In</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={[styles.footerLinkRow, { marginTop: 4, marginBottom: 8 }]}>
+                    <Text style={styles.footerMutedText}>Are you a property owner? </Text>
+                    <TouchableOpacity onPress={() => router.push('/(auth)/landlord-sign-up')}>
+                      <Text style={styles.linkText}>Sign up here →</Text>
                     </TouchableOpacity>
                   </View>
                 </Animated.View>

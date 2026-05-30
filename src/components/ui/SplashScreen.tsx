@@ -85,13 +85,9 @@ export default function SplashScreen() {
       {/* Content wrapper */}
       <Animated.View style={[styles.content, { opacity: containerOpacity }]}>
         <Animated.View style={{ transform: [{ scale: logoScale }], alignItems: 'center' }}>
-          <NestLogo width={260} textColor="#FFFFFF" />
+          <NestLogo width={120} textColor="#FFFFFF" showText={false} />
           <Text style={styles.tagline}>Find Your Perfect Home</Text>
         </Animated.View>
-
-        <View style={styles.footer}>
-          <LoadingDots />
-        </View>
       </Animated.View>
     </View>
   );
@@ -100,7 +96,7 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#3E2723',
+    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -111,7 +107,6 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     flexDirection: 'row',
-    zIndex: -1,
   },
   splitLeft: {
     flex: 1,
@@ -119,14 +114,13 @@ const styles = StyleSheet.create({
   },
   splitRight: {
     flex: 1,
-    backgroundColor: '#3E2723', // Chocolate brown
+    backgroundColor: '#8D6E63', // Chocolate brown
   },
   content: {
     flex: 1,
     width: '100%',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 80,
   },
   tagline: {
     color: '#FFFFFF',

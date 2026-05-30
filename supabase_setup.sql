@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   avatar_url TEXT,
   role TEXT DEFAULT 'tenant', -- 'tenant' or 'landlord'
   rating FLOAT DEFAULT 5.0,
+  id_number TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -25,6 +26,8 @@ CREATE TABLE IF NOT EXISTS public.listings (
   sqft INTEGER,
   description TEXT,
   images TEXT[], -- Array of image URLs
+  latitude DECIMAL,
+  longitude DECIMAL,
 
   emoji TEXT DEFAULT '🏠',
   is_verified BOOLEAN DEFAULT FALSE,
@@ -121,13 +124,14 @@ WITH CHECK (auth.uid() = sender_id);
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, name, email, avatar_url, role)
+  INSERT INTO public.profiles (id, name, email, avatar_url, role, id_number)
   VALUES (
     new.id,
     new.raw_user_meta_data->>'name',
     new.email,
     new.raw_user_meta_data->>'avatar_url',
-    COALESCE(new.raw_user_meta_data->>'role', 'tenant')
+    COALESCE(new.raw_user_meta_data->>'role', 'tenant'),
+    new.raw_user_meta_data->>'id_number'
   );
   RETURN NEW;
 END;
@@ -214,3 +218,12 @@ WITH CHECK (auth.uid() = tenant_id OR auth.uid() = landlord_id);
 DROP POLICY IF EXISTS "Participants can update conversations" ON public.conversations;
 CREATE POLICY "Participants can update conversations" ON public.conversations FOR UPDATE
 USING (auth.uid() = tenant_id OR auth.uid() = landlord_id);
+
+-- Add latitude and longitude columns
+ALTER TABLE public.listings
+  ADD COLUMN IF NOT EXISTS latitude DECIMAL,
+  ADD COLUMN IF NOT EXISTS longitude DECIMAL;
+
+-- Add id_number column to profiles if it doesn't exist
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS id_number TEXT;

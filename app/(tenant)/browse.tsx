@@ -48,6 +48,11 @@ export default function TenantBrowseScreen() {
   const [propertyType, setPropertyType] = useState<string | null>(null);
   const [headerHeight, setHeaderHeight] = useState(90); // Dynamic height to prevent sticky overlaps!
 
+  const [showFilters, setShowFilters] = useState(false);
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [locationFilter, setLocationFilter] = useState('');
+
   const { hideTabBar, showTabBar } = useTabVisibility();
   const lastScrollY = useRef(0);
   const topNavAnim = useRef(new Animated.Value(0)).current;
@@ -166,8 +171,18 @@ export default function TenantBrowseScreen() {
         l.type.toLowerCase().includes(q)
       );
     }
+    if (locationFilter.trim()) {
+      const q = locationFilter.toLowerCase();
+      result = result.filter(l => l.location.toLowerCase().includes(q));
+    }
+    if (minPrice.trim() && !isNaN(Number(minPrice))) {
+      result = result.filter(l => l.price >= Number(minPrice));
+    }
+    if (maxPrice.trim() && !isNaN(Number(maxPrice))) {
+      result = result.filter(l => l.price <= Number(maxPrice));
+    }
     return result;
-  }, [listings, search, propertyType]);
+  }, [listings, search, propertyType, locationFilter, minPrice, maxPrice]);
 
   if (isLoading) {
     return (
@@ -203,6 +218,10 @@ export default function TenantBrowseScreen() {
         </View>
         
         <View style={styles.headerRightContainer}>
+          <TouchableOpacity onPress={() => setShowFilters(!showFilters)} style={{ marginRight: 6 }}>
+            <Ionicons name="options-outline" size={22} color={showFilters ? COLORS.brand : COLORS.secondaryText} />
+          </TouchableOpacity>
+
           {/* Minimized Search Box */}
           <View style={styles.headerSearch}>
             <Ionicons name="search-outline" size={14} color={COLORS.secondaryText} style={{ marginRight: 4 }} />
@@ -259,6 +278,35 @@ export default function TenantBrowseScreen() {
             </TouchableOpacity>
           ))}
         </ScrollView>
+        {showFilters && (
+          <View style={{ paddingHorizontal: SPACING.lg, paddingBottom: SPACING.sm, gap: SPACING.sm }}>
+            <TextInput
+              style={styles.filterInput}
+              placeholder="Filter by location (e.g. Kilimani)"
+              value={locationFilter}
+              onChangeText={setLocationFilter}
+              placeholderTextColor={COLORS.secondaryText}
+            />
+            <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
+              <TextInput
+                style={[styles.filterInput, { flex: 1 }]}
+                placeholder="Min Price"
+                value={minPrice}
+                onChangeText={setMinPrice}
+                keyboardType="numeric"
+                placeholderTextColor={COLORS.secondaryText}
+              />
+              <TextInput
+                style={[styles.filterInput, { flex: 1 }]}
+                placeholder="Max Price"
+                value={maxPrice}
+                onChangeText={setMaxPrice}
+                keyboardType="numeric"
+                placeholderTextColor={COLORS.secondaryText}
+              />
+            </View>
+          </View>
+        )}
       </Animated.View>
 
       {/* Listings FlatList */}
@@ -308,7 +356,7 @@ export default function TenantBrowseScreen() {
             setSelectedListing(null);
             setTimeout(() => {
               setChatListing(item);
-            }, 100);
+            }, 400);
           }}
         />
       )}
@@ -406,6 +454,16 @@ const styles = StyleSheet.create({
   chipActive: {
     backgroundColor: COLORS.brand,
     borderColor: COLORS.brand,
+  },
+  filterInput: {
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: SPACING.sm,
+    height: 36,
+    fontSize: 13,
+    color: COLORS.text,
   },
   roleTag: {
     flexDirection: 'row',

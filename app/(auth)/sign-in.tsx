@@ -205,65 +205,7 @@ export default function SignInScreen() {
     }
   };
 
-  const handleDemoLogin = async () => {
-    setIsLoading(true);
-    const demoEmail = selectedRole === 'landlord' ? 'landlord@nest.com' : 'tenant@nest.com';
-    const demoPassword = 'password123';
-    const demoName = selectedRole === 'landlord' ? 'John Doe (Landlord)' : 'Jane Doe (Tenant)';
-    
-    try {
-      // 1. Try to sign in
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: demoEmail,
-        password: demoPassword,
-      });
 
-      if (error) {
-        // 2. If it fails (e.g. doesn't exist), let's register the demo account automatically!
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email: demoEmail,
-          password: demoPassword,
-          options: {
-            data: {
-              name: demoName,
-              role: selectedRole,
-            }
-          }
-        });
-
-        if (signUpError) {
-          Alert.alert('Demo Login Failed', signUpError.message);
-          return;
-        }
-
-        // Wait a second for trigger to complete, then sign in
-        const { error: secondSignInError } = await supabase.auth.signInWithPassword({
-          email: demoEmail,
-          password: demoPassword,
-        });
-
-        if (secondSignInError) {
-          Alert.alert('Demo Login Failed', secondSignInError.message);
-          return;
-        }
-      }
-
-      // 3. Settle active state
-      await setRole(selectedRole);
-      await completeOnboarding();
-      
-      if (selectedRole === 'landlord') {
-        router.replace('/(landlord-tabs)/dashboard');
-      } else {
-        router.replace('/(tenant-tabs)/browse');
-      }
-      
-    } catch (err: any) {
-      Alert.alert('Error', err?.message || 'Failed to initialize demo account.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
@@ -293,7 +235,7 @@ export default function SignInScreen() {
         // MOBILE STACKED LAYOUT
         <ScrollView style={styles.mobileScrollView} keyboardShouldPersistTaps="handled">
           <View style={styles.mobileTopHeader}>
-            <NestLogo width={180} textColor="#FFFFFF" />
+            <NestLogo width={180} textColor="#FFFFFF" centered />
           </View>
 
           <View style={styles.mobileFormSection}>
@@ -392,11 +334,7 @@ export default function SignInScreen() {
                 </TouchableOpacity>
               </View>
 
-              <TouchableOpacity style={styles.landlordDemoLink} onPress={handleDemoLogin}>
-                <Text style={styles.landlordDemoText}>
-                  {selectedRole === 'landlord' ? '💼 Log in as Landlord (Demo)' : '🙋‍♂️ Log in as Tenant (Demo)'}
-                </Text>
-              </TouchableOpacity>
+
             </Animated.View>
           </View>
         </ScrollView>
@@ -405,7 +343,7 @@ export default function SignInScreen() {
         <View style={styles.splitScreenContainer}>
           {/* Left Chocolate Panel */}
           <View style={styles.leftChocolatePanel}>
-            <NestLogo width={240} textColor="#FFFFFF" />
+            <NestLogo width={240} textColor="#FFFFFF" centered />
             <Text style={styles.leftTagline}>Find Your Perfect Home</Text>
           </View>
 
@@ -507,11 +445,7 @@ export default function SignInScreen() {
                     </TouchableOpacity>
                   </View>
 
-                  <TouchableOpacity style={styles.landlordDemoLink} onPress={handleDemoLogin}>
-                    <Text style={styles.landlordDemoText}>
-                      {selectedRole === 'landlord' ? '💼 Log in as Landlord (Demo)' : '🙋‍♂️ Log in as Tenant (Demo)'}
-                    </Text>
-                  </TouchableOpacity>
+
                 </Animated.View>
               </View>
             </ScrollView>
@@ -537,7 +471,7 @@ const styles = StyleSheet.create({
   },
   leftChocolatePanel: {
     width: '45%',
-    backgroundColor: '#3E2723', // Solid chocolate brown
+    backgroundColor: '#8D6E63', // Solid chocolate brown
     justifyContent: 'center',
     alignItems: 'center',
     padding: 40,
@@ -567,7 +501,7 @@ const styles = StyleSheet.create({
   },
   mobileTopHeader: {
     height: 200,
-    backgroundColor: '#3E2723', // Solid chocolate brown on top
+    backgroundColor: '#8D6E63', // Solid chocolate brown on top
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -636,12 +570,12 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     width: '100%',
-    backgroundColor: '#3E2723', // Chocolate brown primary button
+    backgroundColor: '#8D6E63', // Chocolate brown primary button
     height: 54,
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#3E2723',
+    shadowColor: '#8D6E63',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 10,
@@ -708,7 +642,7 @@ const styles = StyleSheet.create({
   },
   landlordDemoText: {
     fontSize: 13,
-    color: '#3E2723', // Warm rich chocolate brown
+    color: '#8D6E63', // Warm rich chocolate brown
     fontWeight: 'bold',
   },
   roleToggleContainer: {

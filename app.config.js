@@ -1,4 +1,4 @@
-{
+module.exports = {
   "expo": {
     "name": "househunt",
     "slug": "nest",
@@ -9,7 +9,7 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#FAF8F5"
     },
@@ -23,7 +23,12 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "config": {
+        "googleMaps": {
+          "apiKey": process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

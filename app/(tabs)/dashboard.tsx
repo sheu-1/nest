@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Circle } from 'react-native-svg';
 import { COLORS, RADIUS, SPACING } from '../../src/constants/theme';
@@ -248,6 +249,7 @@ const rowStyles = StyleSheet.create({
 export default function LandlordDashboard() {
   const { user } = useAuth();
   const { showToast } = useToast();
+  const router = useRouter();
   const [listings, setListings] = useState<Listing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [headerHeight, setHeaderHeight] = useState(90); // Dynamic height to prevent sticky overlaps!
@@ -352,7 +354,7 @@ export default function LandlordDashboard() {
   };
 
   const handleEdit = (listing: Listing) => {
-    showToast('Edit coming soon!', 'success');
+    router.push({ pathname: '/(landlord-tabs)/post', params: { editId: listing.id } });
   };
 
   const totalListings = listings.length;

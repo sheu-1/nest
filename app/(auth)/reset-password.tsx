@@ -80,9 +80,15 @@ export default function ResetPasswordScreen() {
           [
             {
               text: 'Sign In',
-              onPress: async () => {
-                await supabase.auth.signOut();
-                router.replace('/(auth)/sign-in');
+              onPress: () => {
+                setIsLoading(true);
+                // Ensure signOut doesn't block navigation forever
+                Promise.race([
+                  supabase.auth.signOut(),
+                  new Promise(resolve => setTimeout(resolve, 2000))
+                ]).finally(() => {
+                  router.replace('/(auth)/sign-in');
+                });
               },
             },
           ]
@@ -313,7 +319,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#3E2723',
+    color: '#8D6E63',
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.5,

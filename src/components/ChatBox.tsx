@@ -13,6 +13,25 @@ import { Ionicons } from '@expo/vector-icons';
 import { COLORS, RADIUS, SPACING } from '../constants/theme';
 import { Text } from './ui/Typography';
 
+const getInitials = (name: string) => {
+  if (!name) return '??';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+  return parts[0].slice(0, 2).toUpperCase();
+};
+
+const getAvatarBgColor = (name: string) => {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const colors = ['#C8511B', '#8D6E63', '#8D6E63', '#D84315', '#E65100', '#8D6E63'];
+  const index = Math.abs(hash) % colors.length;
+  return colors[index];
+};
+
 interface Message {
   id: string;
   text: string;
@@ -28,14 +47,7 @@ interface Props {
 }
 
 export const ChatBox: React.FC<Props> = ({ title, subtitle, avatar, context }) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: "Hi! Ask me anything about this property.",
-      sender: 'assistant',
-      timestamp: 'Just now',
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const flatListRef = useRef<FlatList>(null);
 
@@ -51,17 +63,6 @@ export const ChatBox: React.FC<Props> = ({ title, subtitle, avatar, context }) =
 
     setMessages(prev => [...prev, newMessage]);
     setInputText('');
-
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        text: `I can tell you more about ${title}. It features ${context}. What else would you like to know?`,
-        sender: 'assistant',
-        timestamp: 'Just now',
-      };
-      setMessages(prev => [...prev, aiResponse]);
-    }, 1000);
   };
 
   return (
@@ -72,7 +73,9 @@ export const ChatBox: React.FC<Props> = ({ title, subtitle, avatar, context }) =
     >
       <View style={styles.header}>
         <View style={styles.headerInfo}>
-          {avatar && <Image source={{ uri: avatar }} style={styles.avatar} />}
+          <View style={[styles.avatarCircle, { backgroundColor: getAvatarBgColor(title) }]}>
+            <Text style={styles.avatarInitials}>{getInitials(title)}</Text>
+          </View>
           <View>
             <Text variant="h3">{title}</Text>
             {subtitle && <Text variant="small" color={COLORS.secondaryText}>{subtitle}</Text>}
@@ -149,11 +152,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  avatar: {
+  avatarCircle: {
     width: 40,
     height: 40,
     borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: SPACING.sm,
+  },
+  avatarInitials: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   messageList: {
     padding: SPACING.md,
