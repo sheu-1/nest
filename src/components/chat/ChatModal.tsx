@@ -333,7 +333,7 @@ export const ChatModal: React.FC<ChatModalProps> = ({
                     isMe ? styles.bubbleMe : styles.bubbleThem
                   ]}>
                     {/* Sent: Dark Chocolate on Orange | Received: White on Accent Chocolate */}
-                    <Text variant="body" style={{ color: isMe ? '#180E09' : '#FFFFFF', lineHeight: 20 }}>
+                    <Text variant="body" style={{ color: isMe ? '#0a0501' : '#FFFFFF', lineHeight: 20 }}>
                       {item.text}
                     </Text>
                     <Text style={[

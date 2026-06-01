@@ -29,9 +29,9 @@ function PrivacyPolicyModal({ visible, onClose }: { visible: boolean; onClose: (
       <View style={modal.overlay}>
         <View style={modal.sheet}>
           <View style={modal.header}>
-            <Text variant="h2" bold style={{ color: '#7a480d' }}>Privacy Policy</Text>
+            <Text variant="h2" bold style={{ color: '#0a0501' }}>Privacy Policy</Text>
             <TouchableOpacity onPress={onClose} style={modal.closeBtn}>
-              <Ionicons name="close" size={22} color="#7a480d" />
+              <Ionicons name="close" size={22} color="#0a0501" />
             </TouchableOpacity>
           </View>
           <ScrollView showsVerticalScrollIndicator={false}>
@@ -53,7 +53,7 @@ function PrivacyPolicyModal({ visible, onClose }: { visible: boolean; onClose: (
               Your personal data is used exclusively for the purpose of running the Nest platform. This includes verifying your identity as a property owner, enabling tenants to contact you about listings, and ensuring the safety and trust of our community.
             </Text>
 
-            <Text variant="body" bold style={[modal.sectionTitle, { color: '#C8511B' }]}>
+            <Text variant="body" bold style={[modal.sectionTitle, { color: '#0a0501' }]}>
               🔒 We Do NOT Share or Sell Your Data
             </Text>
             <Text variant="body" style={modal.policyText}>
@@ -72,7 +72,7 @@ function PrivacyPolicyModal({ visible, onClose }: { visible: boolean; onClose: (
 
             <TouchableOpacity
               onPress={onClose}
-              style={[modal.primaryBtn, { backgroundColor: '#7a480d' }]}
+              style={[modal.primaryBtn, { backgroundColor: '#0a0501' }]}
             >
               <Text style={modal.primaryBtnText}>I Understand</Text>
             </TouchableOpacity>
@@ -196,7 +196,7 @@ export default function LandlordSignUpScreen() {
             {/* Header */}
             <View style={styles.headerBlock}>
               <View style={styles.landlordBadge}>
-                <Ionicons name="business" size={18} color="#7a480d" />
+                <Ionicons name="business" size={18} color="#0a0501" />
                 <Text style={styles.landlordBadgeText}>Property Owner Registration</Text>
               </View>
               <Text style={styles.heading}>Create Owner Account</Text>
@@ -205,10 +205,10 @@ export default function LandlordSignUpScreen() {
 
             {/* Privacy notice banner */}
             <View style={styles.privacyBanner}>
-              <Ionicons name="shield-checkmark" size={20} color="#7a480d" />
+              <Ionicons name="shield-checkmark" size={20} color="#0a0501" />
               <Text style={styles.privacyBannerText}>
                 Your data is encrypted and never sold.{' '}
-                <Text style={styles.privacyBannerLink} onPress={() => setShowPrivacyPolicy(true)}>
+                <Text style={styles.privacyBannerLink} onPress={() => router.push('/(auth)/terms')}>
                   Read our Privacy Policy
                 </Text>
               </Text>
@@ -217,7 +217,7 @@ export default function LandlordSignUpScreen() {
             <Animated.View style={{ transform: [{ translateX: shakeAnim }], width: '100%' }}>
               <Text style={styles.label}>Full Name</Text>
               <View style={[styles.inputWrapper, isNameFocused && styles.inputWrapperFocused]}>
-                <Ionicons name="person-outline" size={18} color={isNameFocused ? '#C8511B' : '#888888'} />
+                <Ionicons name="person-outline" size={18} color={isNameFocused ? '#0a0501' : '#888888'} />
                 <TextInput
                   style={styles.textInput}
                   placeholder="John Doe"
@@ -231,7 +231,7 @@ export default function LandlordSignUpScreen() {
 
               <Text style={styles.label}>Email Address</Text>
               <View style={[styles.inputWrapper, isEmailFocused && styles.inputWrapperFocused]}>
-                <Ionicons name="mail-outline" size={18} color={isEmailFocused ? '#C8511B' : '#888888'} />
+                <Ionicons name="mail-outline" size={18} color={isEmailFocused ? '#0a0501' : '#888888'} />
                 <TextInput
                   style={styles.textInput}
                   placeholder="name@example.com"
@@ -247,7 +247,7 @@ export default function LandlordSignUpScreen() {
 
               <Text style={styles.label}>Phone Number</Text>
               <View style={[styles.inputWrapper, isPhoneFocused && styles.inputWrapperFocused]}>
-                <Ionicons name="call-outline" size={18} color={isPhoneFocused ? '#C8511B' : '#888888'} />
+                <Ionicons name="call-outline" size={18} color={isPhoneFocused ? '#0a0501' : '#888888'} />
                 <TextInput
                   style={styles.textInput}
                   placeholder="+254712345678"
@@ -263,11 +263,11 @@ export default function LandlordSignUpScreen() {
               {/* ID Number — unique to landlord flow */}
               <Text style={styles.label}>National ID / Passport Number</Text>
               <View style={styles.idHint}>
-                <Ionicons name="lock-closed" size={12} color="#7a480d" />
+                <Ionicons name="lock-closed" size={12} color="#0a0501" />
                 <Text style={styles.idHintText}>Encrypted & used for identity verification only</Text>
               </View>
               <View style={[styles.inputWrapper, isIdFocused && styles.inputWrapperFocused, styles.inputWrapperHighlight]}>
-                <Ionicons name="card-outline" size={18} color={isIdFocused ? '#7a480d' : '#7a480d'} />
+                <Ionicons name="card-outline" size={18} color={isIdFocused ? '#0a0501' : '#0a0501'} />
                 <TextInput
                   style={styles.textInput}
                   placeholder="e.g. 12345678 or A12345678"
@@ -282,7 +282,7 @@ export default function LandlordSignUpScreen() {
 
               <Text style={styles.label}>Password</Text>
               <View style={[styles.inputWrapper, isPasswordFocused && styles.inputWrapperFocused]}>
-                <Ionicons name="lock-closed-outline" size={18} color={isPasswordFocused ? '#C8511B' : '#888888'} />
+                <Ionicons name="lock-closed-outline" size={18} color={isPasswordFocused ? '#0a0501' : '#888888'} />
                 <TextInput
                   style={styles.textInput}
                   placeholder="••••••••"
@@ -309,7 +309,7 @@ export default function LandlordSignUpScreen() {
                 </View>
                 <Text style={styles.checkboxText}>
                   I agree to the{' '}
-                  <Text style={styles.linkText} onPress={() => setShowPrivacyPolicy(true)}>
+                  <Text style={styles.linkText} onPress={() => router.push('/(auth)/terms')}>
                     Privacy Policy & Terms of Service
                   </Text>
                   {'\n'}
@@ -373,7 +373,7 @@ export default function LandlordSignUpScreen() {
             <ScrollView contentContainerStyle={styles.desktopScrollViewContent} keyboardShouldPersistTaps="handled">
               <View style={{ width: '100%', maxWidth: 480 }}>
                 <View style={styles.landlordBadge}>
-                  <Ionicons name="business" size={18} color="#7a480d" />
+                  <Ionicons name="business" size={18} color="#0a0501" />
                   <Text style={styles.landlordBadgeText}>Property Owner Registration</Text>
                 </View>
                 <View style={styles.headerBlock}>
@@ -382,10 +382,10 @@ export default function LandlordSignUpScreen() {
                 </View>
 
                 <View style={styles.privacyBanner}>
-                  <Ionicons name="shield-checkmark" size={20} color="#7a480d" />
+                  <Ionicons name="shield-checkmark" size={20} color="#0a0501" />
                   <Text style={styles.privacyBannerText}>
                     Your data is encrypted and never sold.{' '}
-                    <Text style={styles.privacyBannerLink} onPress={() => setShowPrivacyPolicy(true)}>
+                    <Text style={styles.privacyBannerLink} onPress={() => router.push('/(auth)/terms')}>
                       Read our Privacy Policy
                     </Text>
                   </Text>
@@ -394,7 +394,7 @@ export default function LandlordSignUpScreen() {
                 <Animated.View style={{ transform: [{ translateX: shakeAnim }], width: '100%' }}>
                   <Text style={styles.label}>Full Name</Text>
                   <View style={[styles.inputWrapper, isNameFocused && styles.inputWrapperFocused]}>
-                    <Ionicons name="person-outline" size={18} color={isNameFocused ? '#C8511B' : '#888888'} />
+                    <Ionicons name="person-outline" size={18} color={isNameFocused ? '#0a0501' : '#888888'} />
                     <TextInput
                       style={styles.textInput}
                       placeholder="John Doe"
@@ -408,7 +408,7 @@ export default function LandlordSignUpScreen() {
 
                   <Text style={styles.label}>Email Address</Text>
                   <View style={[styles.inputWrapper, isEmailFocused && styles.inputWrapperFocused]}>
-                    <Ionicons name="mail-outline" size={18} color={isEmailFocused ? '#C8511B' : '#888888'} />
+                    <Ionicons name="mail-outline" size={18} color={isEmailFocused ? '#0a0501' : '#888888'} />
                     <TextInput
                       style={styles.textInput}
                       placeholder="name@example.com"
@@ -424,7 +424,7 @@ export default function LandlordSignUpScreen() {
 
                   <Text style={styles.label}>Phone Number</Text>
                   <View style={[styles.inputWrapper, isPhoneFocused && styles.inputWrapperFocused]}>
-                    <Ionicons name="call-outline" size={18} color={isPhoneFocused ? '#C8511B' : '#888888'} />
+                    <Ionicons name="call-outline" size={18} color={isPhoneFocused ? '#0a0501' : '#888888'} />
                     <TextInput
                       style={styles.textInput}
                       placeholder="+254712345678"
@@ -439,11 +439,11 @@ export default function LandlordSignUpScreen() {
 
                   <Text style={styles.label}>National ID / Passport Number</Text>
                   <View style={styles.idHint}>
-                    <Ionicons name="lock-closed" size={12} color="#7a480d" />
+                    <Ionicons name="lock-closed" size={12} color="#0a0501" />
                     <Text style={styles.idHintText}>Encrypted & used for identity verification only</Text>
                   </View>
                   <View style={[styles.inputWrapper, isIdFocused && styles.inputWrapperFocused, styles.inputWrapperHighlight]}>
-                    <Ionicons name="card-outline" size={18} color="#7a480d" />
+                    <Ionicons name="card-outline" size={18} color="#0a0501" />
                     <TextInput
                       style={styles.textInput}
                       placeholder="e.g. 12345678 or A12345678"
@@ -458,7 +458,7 @@ export default function LandlordSignUpScreen() {
 
                   <Text style={styles.label}>Password</Text>
                   <View style={[styles.inputWrapper, isPasswordFocused && styles.inputWrapperFocused]}>
-                    <Ionicons name="lock-closed-outline" size={18} color={isPasswordFocused ? '#C8511B' : '#888888'} />
+                    <Ionicons name="lock-closed-outline" size={18} color={isPasswordFocused ? '#0a0501' : '#888888'} />
                     <TextInput
                       style={styles.textInput}
                       placeholder="••••••••"
@@ -484,7 +484,7 @@ export default function LandlordSignUpScreen() {
                     </View>
                     <Text style={styles.checkboxText}>
                       I agree to the{' '}
-                      <Text style={styles.linkText} onPress={() => setShowPrivacyPolicy(true)}>
+                      <Text style={styles.linkText} onPress={() => router.push('/(auth)/terms')}>
                         Privacy Policy & Terms of Service
                       </Text>
                       {'\n'}
@@ -532,7 +532,7 @@ const styles = StyleSheet.create({
   splitScreenContainer: { flex: 1, flexDirection: 'row' },
   leftPanel: {
     width: '45%',
-    backgroundColor: '#7a480d',
+    backgroundColor: '#0a0501',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 40,
@@ -548,7 +548,7 @@ const styles = StyleSheet.create({
   mobileScrollView: { flex: 1, backgroundColor: '#FFFFFF' },
   mobileTopHeader: {
     height: 200,
-    backgroundColor: '#7a480d',
+    backgroundColor: '#0a0501',
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
@@ -577,7 +577,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(141, 110, 99, 0.25)',
   },
-  landlordBadgeText: { fontSize: 12, fontWeight: '600', color: '#7a480d' },
+  landlordBadgeText: { fontSize: 12, fontWeight: '600', color: '#0a0501' },
 
   privacyBanner: {
     flexDirection: 'row',
@@ -591,10 +591,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   privacyBannerText: { flex: 1, fontSize: 12, color: '#555555', lineHeight: 18 },
-  privacyBannerLink: { color: '#7a480d', fontWeight: 'bold', textDecorationLine: 'underline' },
+  privacyBannerLink: { color: '#0a0501', fontWeight: 'bold', textDecorationLine: 'underline' },
 
   idHint: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 },
-  idHintText: { fontSize: 11, color: '#7a480d' },
+  idHintText: { fontSize: 11, color: '#0a0501' },
   inputWrapperHighlight: { borderColor: 'rgba(141,110,99,0.4)', backgroundColor: 'rgba(141,110,99,0.04)' },
 
   headerBlock: { marginBottom: 16 },
@@ -611,7 +611,7 @@ const styles = StyleSheet.create({
     height: 52,
     backgroundColor: '#FAFAFA',
   },
-  inputWrapperFocused: { borderColor: '#C8511B', backgroundColor: '#FFFFFF' },
+  inputWrapperFocused: { borderColor: '#0a0501', backgroundColor: '#FFFFFF' },
   textInput: { flex: 1, marginLeft: 10, fontSize: 14, color: '#1A1A1A' },
   eyeBtn: { padding: SPACING.xs },
   checkboxRow: { flexDirection: 'row', alignItems: 'flex-start', marginTop: 18, marginBottom: 24 },
@@ -627,18 +627,18 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginTop: 2,
   },
-  checkboxChecked: { backgroundColor: '#7a480d', borderColor: '#7a480d' },
+  checkboxChecked: { backgroundColor: '#0a0501', borderColor: '#0a0501' },
   checkboxText: { flex: 1, fontSize: 12, color: '#555555', lineHeight: 18 },
   checkboxSubText: { fontSize: 11, color: '#888888', fontStyle: 'italic' },
-  linkText: { fontSize: 12, color: '#C8511B', fontWeight: 'bold' },
+  linkText: { fontSize: 12, color: '#0a0501', fontWeight: 'bold' },
   primaryButton: {
     width: '100%',
-    backgroundColor: '#7a480d',
+    backgroundColor: '#0a0501',
     height: 54,
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#7a480d',
+    shadowColor: '#0a0501',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 12,
@@ -668,7 +668,7 @@ const modal = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E8E0D8',
   },
-  sectionTitle: { color: '#7a480d', marginTop: 16, marginBottom: 4 },
+  sectionTitle: { color: '#0a0501', marginTop: 16, marginBottom: 4 },
   policyText: { fontSize: 14, color: '#555555', lineHeight: 22 },
   primaryBtn: { width: '100%', height: 52, borderRadius: 10, justifyContent: 'center', alignItems: 'center', marginTop: 8 },
   primaryBtnText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 15 },

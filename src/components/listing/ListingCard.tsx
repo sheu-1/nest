@@ -226,6 +226,12 @@ export const ListingCard: React.FC<Props> = ({ listing, onPress, onToggleSave, o
             )}
           />
         )}
+        {listing.images && listing.images.length > 1 && !showMap && (
+          <View style={styles.multiMediaIcon}>
+            <Ionicons name="images" size={14} color="#FFFFFF" />
+            <Text variant="caption" bold style={{color: '#fff', marginLeft: 4}}>1/{listing.images.length}</Text>
+          </View>
+        )}
       </View>
 
       {/* 3. Action Buttons Bar */}
@@ -420,5 +426,16 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     marginTop: 6,
     letterSpacing: 0.3,
+  },
+  multiMediaIcon: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    borderRadius: RADIUS.full,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

@@ -158,7 +158,7 @@ export default function SignUpScreen() {
               style={styles.ownerBanner}
               onPress={() => router.push('/(auth)/landlord-sign-up')}
             >
-              <Ionicons name="business-outline" size={16} color="#7a480d" />
+              <Ionicons name="business-outline" size={16} color="#0a0501" />
               <Text style={styles.ownerBannerText}>Are you a property owner? <Text style={styles.ownerBannerLink}>Sign up here →</Text></Text>
             </TouchableOpacity>
 
@@ -166,7 +166,7 @@ export default function SignUpScreen() {
               {/* Fields */}
               <Text style={styles.label}>Full Name</Text>
               <View style={[styles.inputWrapper, isNameFocused && styles.inputWrapperFocused]}>
-                <Ionicons name="person-outline" size={18} color={isNameFocused ? '#C8511B' : '#888888'} />
+                <Ionicons name="person-outline" size={18} color={isNameFocused ? '#0a0501' : '#888888'} />
                 <TextInput
                   style={styles.textInput}
                   placeholder="Jane Doe"
@@ -180,7 +180,7 @@ export default function SignUpScreen() {
 
               <Text style={styles.label}>Email Address</Text>
               <View style={[styles.inputWrapper, isEmailFocused && styles.inputWrapperFocused]}>
-                <Ionicons name="mail-outline" size={18} color={isEmailFocused ? '#C8511B' : '#888888'} />
+                <Ionicons name="mail-outline" size={18} color={isEmailFocused ? '#0a0501' : '#888888'} />
                 <TextInput
                   style={styles.textInput}
                   placeholder="name@example.com"
@@ -196,7 +196,7 @@ export default function SignUpScreen() {
 
               <Text style={styles.label}>Phone Number</Text>
               <View style={[styles.inputWrapper, isPhoneFocused && styles.inputWrapperFocused]}>
-                <Ionicons name="call-outline" size={18} color={isPhoneFocused ? '#C8511B' : '#888888'} />
+                <Ionicons name="call-outline" size={18} color={isPhoneFocused ? '#0a0501' : '#888888'} />
                 <TextInput
                   style={styles.textInput}
                   placeholder="+254712345678"
@@ -211,7 +211,7 @@ export default function SignUpScreen() {
 
               <Text style={styles.label}>Password</Text>
               <View style={[styles.inputWrapper, isPasswordFocused && styles.inputWrapperFocused]}>
-                <Ionicons name="lock-closed-outline" size={18} color={isPasswordFocused ? '#C8511B' : '#888888'} />
+                <Ionicons name="lock-closed-outline" size={18} color={isPasswordFocused ? '#0a0501' : '#888888'} />
                 <TextInput
                   style={styles.textInput}
                   placeholder="••••••••"
@@ -276,7 +276,7 @@ export default function SignUpScreen() {
                 <Animated.View style={{ transform: [{ translateX: shakeAnim }], width: '100%' }}>
                   <Text style={styles.label}>Full Name</Text>
                   <View style={[styles.inputWrapper, isNameFocused && styles.inputWrapperFocused]}>
-                    <Ionicons name="person-outline" size={18} color={isNameFocused ? '#C8511B' : '#888888'} />
+                    <Ionicons name="person-outline" size={18} color={isNameFocused ? '#0a0501' : '#888888'} />
                     <TextInput
                       style={styles.textInput}
                       placeholder="Jane Doe"
@@ -290,7 +290,7 @@ export default function SignUpScreen() {
 
                   <Text style={styles.label}>Email Address</Text>
                   <View style={[styles.inputWrapper, isEmailFocused && styles.inputWrapperFocused]}>
-                    <Ionicons name="mail-outline" size={18} color={isEmailFocused ? '#C8511B' : '#888888'} />
+                    <Ionicons name="mail-outline" size={18} color={isEmailFocused ? '#0a0501' : '#888888'} />
                     <TextInput
                       style={styles.textInput}
                       placeholder="name@example.com"
@@ -306,7 +306,7 @@ export default function SignUpScreen() {
 
                   <Text style={styles.label}>Phone Number</Text>
                   <View style={[styles.inputWrapper, isPhoneFocused && styles.inputWrapperFocused]}>
-                    <Ionicons name="call-outline" size={18} color={isPhoneFocused ? '#C8511B' : '#888888'} />
+                    <Ionicons name="call-outline" size={18} color={isPhoneFocused ? '#0a0501' : '#888888'} />
                     <TextInput
                       style={styles.textInput}
                       placeholder="+254712345678"
@@ -321,7 +321,7 @@ export default function SignUpScreen() {
 
                   <Text style={styles.label}>Password</Text>
                   <View style={[styles.inputWrapper, isPasswordFocused && styles.inputWrapperFocused]}>
-                    <Ionicons name="lock-closed-outline" size={18} color={isPasswordFocused ? '#C8511B' : '#888888'} />
+                    <Ionicons name="lock-closed-outline" size={18} color={isPasswordFocused ? '#0a0501' : '#888888'} />
                     <TextInput
                       style={styles.textInput}
                       placeholder="••••••••"
@@ -337,16 +337,20 @@ export default function SignUpScreen() {
                     </TouchableOpacity>
                   </View>
 
-                  <TouchableOpacity
-                    style={styles.checkboxRow}
-                    onPress={() => setAgreeTerms(!agreeTerms)}
-                    activeOpacity={0.8}
-                  >
-                    <View style={[styles.checkbox, agreeTerms && styles.checkboxChecked]}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+                    <TouchableOpacity
+                      style={[styles.checkbox, agreeTerms && styles.checkboxChecked]}
+                      onPress={() => setAgreeTerms(!agreeTerms)}
+                    >
                       {agreeTerms && <Ionicons name="checkmark" size={12} color="#FFFFFF" />}
-                    </View>
-                    <Text style={styles.checkboxText}>I agree to the Terms of Service</Text>
-                  </TouchableOpacity>
+                    </TouchableOpacity>
+                    <Text style={styles.checkboxText}>
+                      I agree to the{' '}
+                      <Text style={{ color: COLORS.brand, textDecorationLine: 'underline' }} onPress={() => router.push('/(auth)/terms')}>
+                        Terms of Service & Privacy Policy
+                      </Text>
+                    </Text>
+                  </View>
 
                   <Pressable
                     onPress={handleSignUp}
@@ -383,7 +387,7 @@ const styles = StyleSheet.create({
   },
   leftOrangePanel: {
     width: '45%',
-    backgroundColor: '#C8511B', // Solid orange panel
+    backgroundColor: '#0a0501', // Solid orange panel
     justifyContent: 'center',
     alignItems: 'center',
     padding: 40,
@@ -413,7 +417,7 @@ const styles = StyleSheet.create({
   },
   mobileTopHeader: {
     height: 200,
-    backgroundColor: '#C8511B', // Solid orange on top
+    backgroundColor: '#0a0501', // Solid orange on top
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
@@ -466,7 +470,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAFAFA',
   },
   inputWrapperFocused: {
-    borderColor: '#C8511B', // Brand Orange glow on focus
+    borderColor: '#0a0501', // Brand Orange glow on focus
     backgroundColor: '#FFFFFF',
   },
   textInput: {
@@ -496,8 +500,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   checkboxChecked: {
-    backgroundColor: '#C8511B',
-    borderColor: '#C8511B',
+    backgroundColor: '#0a0501',
+    borderColor: '#0a0501',
   },
   checkboxText: {
     fontSize: 12,
@@ -505,17 +509,17 @@ const styles = StyleSheet.create({
   },
   linkText: {
     fontSize: 12,
-    color: '#C8511B', // Orange highlight links
+    color: '#0a0501', // Orange highlight links
     fontWeight: 'bold',
   },
   primaryButton: {
     width: '100%',
-    backgroundColor: '#C8511B', // Solid orange primary button
+    backgroundColor: '#0a0501', // Solid orange primary button
     height: 54,
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#C8511B',
+    shadowColor: '#0a0501',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 12,
@@ -587,8 +591,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   roleTabActive: {
-    backgroundColor: '#C8511B', // Vibrant brand orange active tab background
-    shadowColor: '#C8511B',
+    backgroundColor: '#0a0501', // Vibrant brand orange active tab background
+    shadowColor: '#0a0501',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -620,7 +624,7 @@ const styles = StyleSheet.create({
     color: '#555555',
   },
   ownerBannerLink: {
-    color: '#7a480d',
+    color: '#0a0501',
     fontWeight: 'bold',
   },
 });

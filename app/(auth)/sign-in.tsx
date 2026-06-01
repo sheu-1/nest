@@ -64,9 +64,9 @@ function ForgotPasswordModal({ visible, onClose }: { visible: boolean; onClose: 
       <View style={modal.overlay}>
         <View style={modal.sheet}>
           <View style={modal.header}>
-            <Text variant="h2" bold style={{ color: '#C8511B' }}>Forgot Password</Text>
+            <Text variant="h2" bold style={{ color: '#0a0501' }}>Forgot Password</Text>
             <TouchableOpacity onPress={handleClose} style={modal.closeBtn}>
-              <Ionicons name="close" size={22} color="#C8511B" />
+              <Ionicons name="close" size={22} color="#0a0501" />
             </TouchableOpacity>
           </View>
 
@@ -75,13 +75,13 @@ function ForgotPasswordModal({ visible, onClose }: { visible: boolean; onClose: 
               <View style={modal.successIcon}>
                 <Ionicons name="checkmark-circle" size={56} color="#2E7D32" />
               </View>
-              <Text variant="h3" bold align="center" style={{ marginTop: SPACING.md, color: '#C8511B' }}>Email Sent!</Text>
+              <Text variant="h3" bold align="center" style={{ marginTop: SPACING.md, color: '#0a0501' }}>Email Sent!</Text>
               <Text variant="body" color="#888888" align="center" style={{ marginTop: SPACING.sm }}>
                 Check your inbox at {resetEmail} for a password reset link.
               </Text>
               <TouchableOpacity
                 onPress={handleClose}
-                style={[modal.primaryBtn, { backgroundColor: '#C8511B', marginTop: SPACING.xl }]}
+                style={[modal.primaryBtn, { backgroundColor: '#0a0501', marginTop: SPACING.xl }]}
               >
                 <Text style={modal.primaryBtnText}>Back to Sign In</Text>
               </TouchableOpacity>
@@ -110,7 +110,7 @@ function ForgotPasswordModal({ visible, onClose }: { visible: boolean; onClose: 
               <TouchableOpacity
                 onPress={handleSend}
                 disabled={isSending}
-                style={[modal.primaryBtn, { backgroundColor: '#C8511B', marginTop: SPACING.xl }]}
+                style={[modal.primaryBtn, { backgroundColor: '#0a0501', marginTop: SPACING.xl }]}
               >
                 {isSending ? (
                   <ActivityIndicator size="small" color="#FFFFFF" />
@@ -189,7 +189,7 @@ export default function SignInScreen() {
         }
 
         await completeOnboarding();
-        
+
         if (finalRole === 'landlord') {
           router.replace('/(landlord-tabs)/dashboard');
         } else {
@@ -245,21 +245,21 @@ export default function SignInScreen() {
             </View>
 
             <View style={styles.roleToggleContainer}>
-              <TouchableOpacity 
-                style={[styles.roleTab, selectedRole === 'tenant' && styles.roleTabActive]} 
+              <TouchableOpacity
+                style={[styles.roleTab, selectedRole === 'tenant' && styles.roleTabActive]}
                 onPress={() => setSelectedRole('tenant')}
               >
                 <Text style={[styles.roleTabText, selectedRole === 'tenant' && styles.roleTabTextActive]}>
-                  🙋‍♂️ Tenant
+                  Tenant
                 </Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={[styles.roleTab, selectedRole === 'landlord' && styles.roleTabActive]} 
+
+              <TouchableOpacity
+                style={[styles.roleTab, selectedRole === 'landlord' && styles.roleTabActive]}
                 onPress={() => setSelectedRole('landlord')}
               >
                 <Text style={[styles.roleTabText, selectedRole === 'landlord' && styles.roleTabTextActive]}>
-                  💼 Property Owner
+                  Property Owner
                 </Text>
               </TouchableOpacity>
             </View>
@@ -271,7 +271,7 @@ export default function SignInScreen() {
                 styles.inputWrapper,
                 isEmailFocused && styles.inputWrapperFocused
               ]}>
-                <Ionicons name="mail-outline" size={18} color={isEmailFocused ? '#C8511B' : '#888888'} />
+                <Ionicons name="mail-outline" size={18} color={isEmailFocused ? '#0a0501' : '#888888'} />
                 <TextInput
                   style={styles.textInput}
                   placeholder="name@example.com"
@@ -290,7 +290,7 @@ export default function SignInScreen() {
                 styles.inputWrapper,
                 isPasswordFocused && styles.inputWrapperFocused
               ]}>
-                <Ionicons name="lock-closed-outline" size={18} color={isPasswordFocused ? '#C8511B' : '#888888'} />
+                <Ionicons name="lock-closed-outline" size={18} color={isPasswordFocused ? '#0a0501' : '#888888'} />
                 <TextInput
                   style={styles.textInput}
                   placeholder="••••••••"
@@ -357,17 +357,17 @@ export default function SignInScreen() {
                 </View>
 
                 <View style={styles.roleToggleContainer}>
-                  <TouchableOpacity 
-                    style={[styles.roleTab, selectedRole === 'tenant' && styles.roleTabActive]} 
+                  <TouchableOpacity
+                    style={[styles.roleTab, selectedRole === 'tenant' && styles.roleTabActive]}
                     onPress={() => setSelectedRole('tenant')}
                   >
                     <Text style={[styles.roleTabText, selectedRole === 'tenant' && styles.roleTabTextActive]}>
                       🙋‍♂️ Tenant
                     </Text>
                   </TouchableOpacity>
-                  
-                  <TouchableOpacity 
-                    style={[styles.roleTab, selectedRole === 'landlord' && styles.roleTabActive]} 
+
+                  <TouchableOpacity
+                    style={[styles.roleTab, selectedRole === 'landlord' && styles.roleTabActive]}
                     onPress={() => setSelectedRole('landlord')}
                   >
                     <Text style={[styles.roleTabText, selectedRole === 'landlord' && styles.roleTabTextActive]}>
@@ -382,7 +382,7 @@ export default function SignInScreen() {
                     styles.inputWrapper,
                     isEmailFocused && styles.inputWrapperFocused
                   ]}>
-                    <Ionicons name="mail-outline" size={18} color={isEmailFocused ? '#C8511B' : '#888888'} />
+                    <Ionicons name="mail-outline" size={18} color={isEmailFocused ? '#0a0501' : '#888888'} />
                     <TextInput
                       style={styles.textInput}
                       placeholder="name@example.com"
@@ -401,7 +401,7 @@ export default function SignInScreen() {
                     styles.inputWrapper,
                     isPasswordFocused && styles.inputWrapperFocused
                   ]}>
-                    <Ionicons name="lock-closed-outline" size={18} color={isPasswordFocused ? '#C8511B' : '#888888'} />
+                    <Ionicons name="lock-closed-outline" size={18} color={isPasswordFocused ? '#0a0501' : '#888888'} />
                     <TextInput
                       style={styles.textInput}
                       placeholder="••••••••"
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
   },
   leftChocolatePanel: {
     width: '45%',
-    backgroundColor: '#7a480d', // Solid chocolate brown
+    backgroundColor: '#0a0501', // Solid chocolate brown
     justifyContent: 'center',
     alignItems: 'center',
     padding: 40,
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
   },
   mobileTopHeader: {
     height: 200,
-    backgroundColor: '#7a480d', // Solid chocolate brown on top
+    backgroundColor: '#0a0501', // Solid chocolate brown on top
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -547,7 +547,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAFAFA',
   },
   inputWrapperFocused: {
-    borderColor: '#C8511B', // Brand Orange glow on focus
+    borderColor: '#0a0501', // Brand Orange glow on focus
     backgroundColor: '#FFFFFF',
   },
   textInput: {
@@ -566,17 +566,17 @@ const styles = StyleSheet.create({
   },
   linkText: {
     fontSize: 12,
-    color: '#C8511B', // Orange highlight links
+    color: '#0a0501', // Orange highlight links
     fontWeight: 'bold',
   },
   primaryButton: {
     width: '100%',
-    backgroundColor: '#7a480d', // Chocolate brown primary button
+    backgroundColor: '#0a0501', // Chocolate brown primary button
     height: 54,
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#7a480d',
+    shadowColor: '#0a0501',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 10,
@@ -643,7 +643,7 @@ const styles = StyleSheet.create({
   },
   landlordDemoText: {
     fontSize: 13,
-    color: '#7a480d', // Warm rich chocolate brown
+    color: '#0a0501', // Warm rich chocolate brown
     fontWeight: 'bold',
   },
   roleToggleContainer: {
@@ -664,8 +664,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   roleTabActive: {
-    backgroundColor: '#C8511B', // Vibrant brand orange active tab background
-    shadowColor: '#C8511B',
+    backgroundColor: '#0a0501', // Vibrant brand orange active tab background
+    shadowColor: '#0a0501',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,

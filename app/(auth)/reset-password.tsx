@@ -112,7 +112,7 @@ export default function ResetPasswordScreen() {
     <Animated.View style={{ transform: [{ translateX: shakeAnim }], width: '100%' }}>
       <Text style={styles.label}>New Password</Text>
       <View style={[styles.inputWrapper, isPassFocused && styles.inputWrapperFocused]}>
-        <Ionicons name="lock-closed-outline" size={18} color={isPassFocused ? '#C8511B' : '#888888'} />
+        <Ionicons name="lock-closed-outline" size={18} color={isPassFocused ? '#0a0501' : '#888888'} />
         <TextInput
           style={styles.input}
           placeholder="Min. 6 characters"
@@ -153,7 +153,7 @@ export default function ResetPasswordScreen() {
 
       <Text style={styles.label}>Confirm New Password</Text>
       <View style={[styles.inputWrapper, isConfirmFocused && styles.inputWrapperFocused]}>
-        <Ionicons name="checkmark-circle-outline" size={18} color={isConfirmFocused ? '#C8511B' : '#888888'} />
+        <Ionicons name="checkmark-circle-outline" size={18} color={isConfirmFocused ? '#0a0501' : '#888888'} />
         <TextInput
           style={styles.input}
           placeholder="Repeat your password"
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
   },
   leftOrangePanel: {
     width: '40%',
-    backgroundColor: '#C8511B',
+    backgroundColor: '#0a0501',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 40,
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   },
   mobileTopHeader: {
     height: 160,
-    backgroundColor: '#C8511B',
+    backgroundColor: '#0a0501',
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#7a480d',
+    color: '#0a0501',
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAFAFA',
   },
   inputWrapperFocused: {
-    borderColor: '#C8511B',
+    borderColor: '#0a0501',
     backgroundColor: '#FFFFFF',
   },
   input: {
@@ -383,13 +383,13 @@ const styles = StyleSheet.create({
 
   // Button styles
   submitBtn: {
-    backgroundColor: '#C8511B',
+    backgroundColor: '#0a0501',
     height: 52,
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 10,
-    shadowColor: '#C8511B',
+    shadowColor: '#0a0501',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,

@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../src/context/AuthContext';
+import { useRouter } from 'expo-router';
 import { Text } from '../../src/components/ui/Typography';
 import { COLORS, RADIUS, SPACING } from '../../src/constants/theme';
 import { Button } from '../../src/components/ui/Button';
@@ -150,7 +151,8 @@ const cpModal = StyleSheet.create({
 });
 
 export default function ProfileScreen() {
-  const { user, signOut, role } = useAuth();
+  const { user, signOut, role, switchRole } = useAuth();
+  const router = useRouter();
   const { showToast } = useToast();
   const [notifications, setNotifications] = useState(true);
   const [showPhone, setShowPhone] = useState(false);
@@ -247,13 +249,52 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* Permanent Role Notice */}
+        {/* Switch Role */}
         <View style={styles.section}>
-          <View style={styles.noticeBox}>
-            <Ionicons name="lock-closed-outline" size={18} color={COLORS.secondaryText} />
-            <Text variant="small" color={COLORS.secondaryText} style={{ flex: 1, marginLeft: SPACING.sm }}>
-              Your role is <Text variant="small" bold>permanently set as {isLandlord ? 'Landlord' : 'Tenant'}</Text>. To use a different role, sign up with a new account.
-            </Text>
+          <Text variant="h3" bold style={styles.sectionTitle}>Role</Text>
+          <View style={styles.infoCard}>
+            <View style={{ padding: SPACING.md }}>
+              <Text variant="body" style={{ marginBottom: SPACING.sm }}>
+                You are currently signed in as <Text bold>{isLandlord ? 'Property Owner' : 'Tenant'}</Text>
+              </Text>
+              <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: accentColor,
+                  borderRadius: RADIUS.md,
+                  paddingVertical: 14,
+                  gap: 8,
+                }}
+                onPress={() => {
+                  Alert.alert(
+                    'Switch Role',
+                    `Switch from ${isLandlord ? 'Property Owner' : 'Tenant'} to ${isLandlord ? 'Tenant' : 'Property Owner'}?`,
+                    [
+                      { text: 'Cancel', style: 'cancel' },
+                      {
+                        text: 'Switch',
+                        onPress: async () => {
+                          await switchRole();
+                          showToast(`Switched to ${role === 'tenant' ? 'Property Owner' : 'Tenant'}!`, 'success');
+                          if (role === 'tenant') {
+                            router.replace('/(landlord-tabs)/dashboard');
+                          } else {
+                            router.replace('/(tenant-tabs)/browse');
+                          }
+                        },
+                      },
+                    ]
+                  );
+                }}
+              >
+                <Ionicons name="swap-horizontal" size={20} color="#FFFFFF" />
+                <Text style={{ color: '#FFFFFF', fontWeight: 'bold', fontSize: 15 }}>
+                  Switch to {isLandlord ? 'Tenant' : 'Property Owner'}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 

@@ -1,8 +1,8 @@
 export const COLORS = {
   brand: '#FF6F00',      // Highly intense, vibrant premium amber-orange!
   text: '#FF6F00',       // Glowing orange text
-  background: '#180E09', // Deep dark chocolate espresso background
-  card: '#180E09',       // Cards and containers now fully match the chocolate background
+  background: '#0a0501', // Deep dark chocolate espresso background
+  card: '#0a0501',       // Cards and containers now fully match the chocolate background
   accent: '#2D1A11',     // Medium dark chocolate accent
   border: '#341E13',     // Dark chocolate borders
   secondaryText: '#FFFFFF', // Pure white for perfect readable body texts and description words!

@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   },
   splitRight: {
     flex: 1,
-    backgroundColor: '#7a480d', // Chocolate brown
+    backgroundColor: '#0a0501', // Deep dark chocolate
   },
   content: {
     flex: 1,

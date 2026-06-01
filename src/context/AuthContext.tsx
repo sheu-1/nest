@@ -18,6 +18,7 @@ interface AuthContextType {
   onboardingCompleted: boolean;
   completeOnboarding: () => Promise<void>;
   setRole: (role: UserRole) => Promise<void>; // only used during onboarding signup
+  switchRole: () => Promise<void>; // toggle between tenant and landlord
   signIn: (credentials: SignInWithPasswordCredentials) => Promise<{ error: any }>;
   signUp: (credentials: SignUpWithPasswordCredentials) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
@@ -187,6 +188,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const switchRole = async () => {
+    const newRole: UserRole = role === 'tenant' ? 'landlord' : 'tenant';
+    setRoleState(newRole);
+    await storage.setRole(newRole);
+
+    // Update Supabase user_metadata
+    try {
+      await supabase.auth.updateUser({ data: { role: newRole } });
+    } catch (e) {
+      console.warn('Failed to update user_metadata role:', e);
+    }
+
+    // Update profiles table
+    if (user) {
+      try {
+        await supabase.from('profiles').upsert({ id: user.id, role: newRole });
+      } catch (e) {
+        console.warn('Failed to update profiles role:', e);
+      }
+    }
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     // Clear onboarding so next user starts fresh
@@ -197,7 +220,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <AuthContext.Provider value={{
       user, session, isLoading, role, onboardingCompleted,
-      setRole, completeOnboarding, signIn, signUp, signInWithGoogle, resetPasswordForEmail, signOut
+      setRole, switchRole, completeOnboarding, signIn, signUp, signInWithGoogle, resetPasswordForEmail, signOut
     }}>
       {children}
     </AuthContext.Provider>
